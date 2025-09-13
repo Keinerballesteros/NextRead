@@ -18,7 +18,7 @@ function Counter() {
   const [state, dispatch] = useReducer(reducer, { count: 0 });
 
   return (
-    <div className="flex flex-col  min-h-screen gap-2 items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+    <div className="flex flex-col  gap-2 items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
         <div className="flex flex-col justify-center items-center bg-gray-600 p-4 rounded gap-4">
             <h1>Contador: {state.count}</h1>
             <div className="flex  justify-center items-center gap-3">
