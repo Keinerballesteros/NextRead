@@ -17,7 +17,7 @@ function HookUseSyncExternalStore() {
   const width = useWindowWidth();
 
   return (
-    <div className="flex flex-col  min-h-screen gap-2 items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+    <div className="flex flex-col  gap-2 items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
       <div className="flex flex-col justify-center items-center bg-gray-600 p-4 rounded gap-4">
         <h1 className="text-2xl font-bold text-white">Probando useSyncExternalStore</h1>
         <p className="mt-4 text-gray-900">

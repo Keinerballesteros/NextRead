@@ -15,6 +15,14 @@ import HookUseEffect from './playground/HookUseEffect'
 import HookUseId from './playground/HookUseId'
 import HookUseImperativeHandle from './playground/HookUseImperativeHandle'
 import HookUseInsertionEffect from './playground/HookUseInsertionEffect'
+import HookUseLayoutEffect from './playground/HookUseLayoutEffect'
+import HookUseMemo from './playground/HookUseMemo'
+import HookUseOptimistic from './playground/HookUseOptimistic'
+import HookUseReducer from './playground/HookUseReducer'
+import HookUseRef from './playground/HookUseRef'
+import HookUseActionsState from './playground/HookUseActionState'
+import HookUseSyncExternalStore from './playground/HookUseSyncExternalStore'
+import HookUseTransition from './playground/HookUseTransition'
 function App() {
   
 
@@ -32,6 +40,14 @@ function App() {
       <Route path='/useid' element={<HookUseId/>}/>
       <Route path='/useimperativehandle' element={<HookUseImperativeHandle/>}/>
       <Route path='/useinsertioneffect' element={<HookUseInsertionEffect/>}/>
+      <Route path='/uselayouteffect' element={<HookUseLayoutEffect/>}/>
+      <Route path='/usememo' element={<HookUseMemo/>}/>
+      <Route path='/useoptimistic' element={<HookUseOptimistic/>}/>
+      <Route path='/usereducer' element={<HookUseReducer/>}/>
+      <Route path='/useref' element={<HookUseRef/>}/>
+      <Route path='/useactionstate' element={<HookUseActionsState/>}/>
+      <Route path='/usesyncexternalstore' element={<HookUseSyncExternalStore/>}/>
+      <Route path='/usetransition' element={<HookUseTransition/>}/>
       <Route path='/login' element={<LoginPage/>}/>
       <Route path='/register' element={<RegisterPage/>}/>
       <Route path='/confirm' element={<ConfirmEmailPage/>}/>

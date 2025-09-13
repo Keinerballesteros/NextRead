@@ -11,7 +11,7 @@ function HookUseActionState() {
   );
 
   return (
-    <div className="flex flex-col  min-h-screen gap-2 items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+    <div className="flex flex-col gap-2 items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
         <div className="flex flex-col justify-center items-center bg-gray-600 p-4 rounded gap-4">
         <h2 className="text-2xl font-bold mb-4">Probando useActionState</h2>
         
