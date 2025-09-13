@@ -93,16 +93,16 @@ function HomeHooks() {
             {/* row 10 */}
             <tr>
               <th>UseLayoutEffect</th>
-              <td>Cy Ganderton</td>
-              <td>Quality Control Specialist</td>
+              <td>Es un hook similar a useEffect, pero se ejecuta justo después de que React actualiza el DOM y antes de que el navegador pinte en pantalla; se usa cuando necesitas leer o modificar el DOM de forma inmediata (como medir el tamaño de un elemento) para evitar que el usuario vea un “parpadeo” en la interfaz.</td>
+              <td className="text-success">Efecto</td>
               <td><Link to="/uselayouteffect" className="link-accent">Ir al Hook</Link></td>
             </tr>
 
             {/* row 11 */}
              <tr>
               <th>UseMemo</th>
-              <td>Cy Ganderton</td>
-              <td>Quality Control Specialist</td>
+              <td>Memoriza el resultado de una función o cálculo y solo lo vuelve a ejecutar si cambian las dependencias que le indiques; se utiliza para optimizar el rendimiento y evitar cálculos innecesarios en cada render, especialmente en operaciones costosas como filtros, listas grandes o cálculos matemáticos complejos.</td>
+              <td className="text-success">Performance</td>
               <td><Link to="/usememo" className="link-accent">Ir al Hook</Link></td>
             </tr>
 
@@ -110,48 +110,48 @@ function HomeHooks() {
             {/* row 12 */}
             <tr>
               <th>UseOptimistic</th>
-              <td>Cy Ganderton</td>
-              <td>Quality Control Specialist</td>
+              <td>Es un hook experimental pensado para manejar actualizaciones optimistas en la UI, es decir, mostrar de inmediato un cambio (como un “like” o una nueva tarea en una lista) sin esperar la respuesta del servidor, lo que hace que la aplicación se sienta más rápida; luego, si el servidor confirma, se mantiene el cambio, y si falla, se puede revertir.</td>
+              <td className="text-success">Nuevo en React</td>
               <td><Link to="/useoptimistic" className="link-accent">Ir al Hook</Link></td>
             </tr>
 
             {/* row 13 */}
             <tr>
               <th>UseReducer</th>
-              <td>Cy Ganderton</td>
-              <td>Quality Control Specialist</td>
+              <td>Sirve para manejar estados más complejos que con useState, porque en vez de cambiar el valor directamente, usas una función reductora (reducer) que recibe el estado actual y una acción, y devuelve el nuevo estado; esto es útil cuando hay varias formas distintas de modificar el mismo estado, como en un contador con botones para sumar, restar y resetear, o en una lista de tareas con acciones para agregar, eliminar o marcar como completada</td>
+              <td className="text-success">Estado</td>
               <td><Link to="/usereducer" className="link-accent">Ir al Hook</Link></td>
             </tr>
 
             {/* row 14 */}
             <tr>
               <th>UseRef</th>
-              <td>Cy Ganderton</td>
-              <td>Quality Control Specialist</td>
+              <td>Sirve para guardar un valor que no se pierde entre renders, sin que al cambiar ese valor se vuelva a renderizar el componente. También se usa mucho para referenciar elementos del DOM (como inputs o divs) y poder manipularlos directamente (por ejemplo, hacer focus en un input).</td>
+              <td className="text-success">Referencias</td>
               <td><Link to="/useref" className="link-accent">Ir al Hook</Link></td>
             </tr>
 
             {/* row 15 */}
             <tr>
               <th>UseActionsState</th>
-              <td>Cy Ganderton</td>
-              <td>Quality Control Specialist</td>
+              <td>Sirve para manejar el estado de un formulario o acción asíncrona de forma más simple. Cuando usas useActionState, React te da un estado (state) y una función (action) que se encarga de procesar algo (por ejemplo, enviar un formulario) y actualizar automáticamente ese estado con el resultado. Así no tienes que manejar useState manualmente para el “cargando”, “éxito” o “error”.</td>
+              <td className="text-success">Nuevo en React</td>
               <td><Link to="/useactionstate" className="link-accent">Ir al Hook</Link></td>
             </tr>
 
             {/* row 16 */}
             <tr>
               <th>UseSyncExternalStore</th>
-              <td>Cy Ganderton</td>
-              <td>Quality Control Specialist</td>
+              <td>Sirve para conectarte a un estado externo (algo que no está dentro de React, como el localStorage, un store global, o incluso el window con un event listener).</td>
+              <td className="text-success">Contexto</td>
               <td><Link to="/usesyncexternalstore" className="link-accent">Ir al Hook</Link></td>
             </tr>
 
             {/* row 17 */}
             <tr>
               <th>UseTransition</th>
-              <td>Cy Ganderton</td>
-              <td>Quality Control Specialist</td>
+              <td>Sirve para manejar actualizaciones que no son urgentes (como filtros, búsquedas, o cargar datos).</td>
+              <td className="text-success">Performance</td>
               <td><Link to="/usetransition" className="link-accent">Ir al Hook</Link></td>
             </tr>
           </tbody>
