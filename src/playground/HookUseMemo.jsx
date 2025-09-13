@@ -11,7 +11,7 @@ function HookUseMemo() {
   }, [count]);
 
   return (
-    <div className="flex flex-col  min-h-screen gap-2 items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+    <div className="flex flex-col   gap-2 items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
       <h1 className="text-xl font-bold">Probando useMemo</h1>
 
       <p>Contador: {count}</p>

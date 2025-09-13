@@ -101,6 +101,81 @@ useInsertionEffect(() => {
 
 ---
 
+### 10. **useLayoutEffect**
+Se ejecuta después de que el DOM se actualiza pero antes de que el navegador pinte la pantalla.
+Se usa cuando necesitas medir o modificar el DOM inmediatamente.
+```jsx
+useLayoutEffect(() => {
+  console.log("Se ejecuta antes del render visual");
+}, []);
+```
+
+---
+### 11. **useMemo**
+Memoriza un valor calculado para evitar recomputaciones costosas en cada render.
+```jsx
+const resultado = useMemo(() => computoPesado(valor), [valor]);
+```
+
+---
+### 12. **useOptimistic**
+Permite manejar actualizaciones optimistas en la UI, mostrando cambios antes de recibir confirmación del servidor.
+```jsx
+const [optimisticTodos, addOptimisticTodo] = useOptimistic(todos, (state, newTodo) => [...state, newTodo]);
+```
+---
+### 13. **useReducer**
+Maneja estados complejos mediante un reducer (similar a Redux).
+```jsx
+const [state, dispatch] = useReducer(reducer, estadoInicial);
+```
+
+---
+
+### 14. **useRef**
+Mantiene una referencia mutable que no causa re-render cuando cambia.
+Se usa para acceder a elementos del DOM o guardar valores persistentes.
+```jsx
+const inputRef = useRef(null);
+<input ref={inputRef} />
+```
+
+---
+
+### 15. **ActionState**
+Maneja el estado derivado de acciones asíncronas (como formularios).
+```jsx
+const [state, formAction] = useActionState(async (prevState, formData) => {
+  const response = await sendData(formData);
+  return response.success ? "Éxito" : "Error";
+}, "Pendiente");
+```
+
+---
+
+### 16. **useSyncExternalStore**
+Se usa para suscribirse a un store externo de manera segura con React concurrente.
+```jsx
+const state = useSyncExternalStore(store.subscribe, store.getSnapshot);
+```
+
+---
+
+### 17. **useTransition**
+Permite marcar ciertas actualizaciones de estado como transiciones (no urgentes).
+Útil para mejorar la experiencia en renders pesados.
+```jsx
+const [isPending, startTransition] = useTransition();
+
+startTransition(() => {
+  setFiltro(valorPesado);
+});
+```
+
+
+
+---
+
 ## 🔄 Resumen gráfico del orden de ejecución de efectos
 1. **useInsertionEffect** → Antes de que el DOM se actualice  
 2. **useLayoutEffect** → Después de que el DOM se actualiza, pero antes del render visual  
