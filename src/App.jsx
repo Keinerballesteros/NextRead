@@ -5,6 +5,7 @@ import RegisterPage from './pages/auth/RegisterPage/RegisterPage'
 import ConfirmEmailPage from './pages/auth/ConfirmEmailPage/ConfirmEmailPage'
 import ChangePassword from './pages/auth/ChangePassword/ChangePasswordPage'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import HomeHooks from './playground/HomeHooks'
 function App() {
   
 
@@ -12,7 +13,8 @@ function App() {
     <>
      <BrowserRouter>
     <Routes>
-      <Route path='/' element={<LoginPage/>}/>
+      <Route path='/' element={<HomeHooks/>}/>
+      <Route path='/login' element={<LoginPage/>}/>
       <Route path='/register' element={<RegisterPage/>}/>
       <Route path='/confirm' element={<ConfirmEmailPage/>}/>
       <Route path='/change' element={<ChangePassword/>}/>
