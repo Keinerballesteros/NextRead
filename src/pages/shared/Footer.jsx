@@ -1,6 +1,6 @@
 function Footer(){
     return(
-        <footer class="footer sm:footer-horizontal bg-base-300 text-base-content p-10">
+        <footer class="footer sm:footer-horizontal bg-[#f0f0f0] shadow-2xl p-10 text-black">
         <nav>
             <h6 class="footer-title">Services</h6>
             <a class="link link-hover">Branding</a>
