@@ -23,6 +23,7 @@ import HookUseRef from './playground/HookUseRef'
 import HookUseActionsState from './playground/HookUseActionState'
 import HookUseSyncExternalStore from './playground/HookUseSyncExternalStore'
 import HookUseTransition from './playground/HookUseTransition'
+import DashboardPage from './pages/DashboardPage'
 function App() {
   
 
@@ -52,6 +53,7 @@ function App() {
       <Route path='/register' element={<RegisterPage/>}/>
       <Route path='/confirm' element={<ConfirmEmailPage/>}/>
       <Route path='/change' element={<ChangePassword/>}/>
+      <Route path='/dashboard' element={<DashboardPage/>}/>
     </Routes>
     </BrowserRouter>
     </>

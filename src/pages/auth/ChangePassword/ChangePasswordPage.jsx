@@ -1,14 +1,22 @@
 function ChangePassword() {
   return (
-    <section className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+    <section className="flex items-center justify-center min-h-screen bg-[#f0f0f0]">
       <div className="w-full max-w-md bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20">
-        <h2 className="text-3xl font-extrabold text-center text-white mb-6">
+
+       <div className="flex justify-center mb-6">
+          <img 
+            src="../../public/logo.png" 
+            alt="logo" 
+            className="w-40 h-40 rounded-2xl" 
+          />
+        </div>
+        <h2 className="text-3xl font-extrabold text-center text-black mb-6">
           Change Password
         </h2>
 
         <form className="space-y-5">
           
-          <label className="w-full input input-bordered flex items-center gap-2 bg-white/10 text-white placeholder-gray-300">
+          <label className="w-full input input-bordered border-black  flex items-center gap-2 bg-white/10 text-black placeholder-black">
             <svg
               className="h-5 opacity-70"
               xmlns="http://www.w3.org/2000/svg"
@@ -36,7 +44,7 @@ function ChangePassword() {
             />
           </label>
 
-          <label className="w-full input input-bordered flex items-center gap-2 bg-white/10 text-white placeholder-gray-300">
+          <label className="w-full input input-bordered border-black  flex items-center gap-2 bg-white/10 text-black placeholder-black">
             <svg
               className="h-5 opacity-70"
               xmlns="http://www.w3.org/2000/svg"
