@@ -27,7 +27,7 @@ function HookUseRef() {
                 Dar Focus al Input
             </button>
             <div className="bg-white text-black p-2 rounded cursor-pointer">
-                <Link to="/">Volver a Home</Link>
+                <Link to="/home">Volver a Home</Link>
             </div>
         </div>
       

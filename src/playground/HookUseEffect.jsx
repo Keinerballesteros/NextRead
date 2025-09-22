@@ -12,7 +12,7 @@ export default function HookUseEffect() {
         <h1 className='text-5xl font-extrabold'>Hook UseEffect</h1>
       <h1 className='text-4xl font-bold'>Contador: {contador}</h1>
       <button className='btn btn-accent font-bold' onClick={() => setContador(contador + 1)}>Incrementar</button>
-       <Link to="/" className="btn btn-dash w-28 justify-center link-accent mt-2">Ir al Home</Link>
+       <Link to="/home" className="btn btn-dash w-28 justify-center link-accent mt-2">Ir al Home</Link>
     </div>
   );
 }

@@ -23,7 +23,7 @@ function HookUseInsertionEffect() {
       <button className="btn btn-error" onClick={() => setColor("lightcoral")}>Rojo</button>
       </div>
 
-    <Link to="/" className="btn btn-dash w-28 justify-center link-accent mt-2">Ir al Home</Link>
+    <Link to="/home" className="btn btn-dash w-28 justify-center link-accent mt-2">Ir al Home</Link>
 
     </div>
   );
