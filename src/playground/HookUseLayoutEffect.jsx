@@ -22,7 +22,7 @@ function HookUseLayoutEffect() {
         <h1 className="text-xl font-bold mb-4">Probando useLayoutEffect</h1>
         <p>El ancho de la caja es: {width}px</p>
         <div className="bg-white text-black p-2 border rounded w-[100%] text-center mt-4">
-          <Link to="/">Volver al Home</Link>
+          <Link to="/home">Volver al Home</Link>
         </div>
       </div>
     </div>

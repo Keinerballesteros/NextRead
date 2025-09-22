@@ -30,7 +30,7 @@ function HookUseOptimistic() {
       </ul>
       <button onClick={handleAdd} className="bg-gray-500 p-2 rounded cursor-pointer">Agregar tarea</button>
       <div className="bg-white border rounded p-2 text-black">
-        <Link to="/">Volver a Home</Link>
+        <Link to="/home">Volver a Home</Link>
       </div>
     </div>
   );
