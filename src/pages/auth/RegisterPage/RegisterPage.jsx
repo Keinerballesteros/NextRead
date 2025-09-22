@@ -1,4 +1,83 @@
+import { useState } from "react";
+import {Link,useNavigate } from "react-router-dom";
+import {auth, db} from '../../../firebase'
+import { doc, setDoc } from "firebase/firestore";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import Swal from "sweetalert2";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
 function RegisterPage() {
+const navigate = useNavigate();
+
+const [showPassword, setShowPassword] = useState(false);
+
+
+
+  const [formData, setFormData] = useState({
+    username: "", 
+    email: "", 
+    password: "", 
+    confirmPassword: "" 
+  });
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,  
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const { username, email, password, confirmPassword } = formData;
+
+    // Validaciones 
+    if (!username || !email || !password || !confirmPassword) {
+      return Swal.fire("Error", "Todos los campos son obligatorios", "error");
+    }
+    if (password.length < 6) {
+      return Swal.fire("Error", "La contraseña debe tener al menos 6 caracteres", "error");
+    }
+    if (password !== confirmPassword) {
+      return Swal.fire("Error", "Las contraseñas no coinciden", "error");
+    }
+
+    try {
+      const emailLower = email.toLowerCase();
+
+      // Crear usuario para el servicio de Autenticación de Firebase
+      const userCredential = await createUserWithEmailAndPassword(auth, emailLower, password);
+      const user = userCredential.user;
+
+      // Guardar datos en Firestore
+      await setDoc(doc(db, "Users", user.uid), {
+        uid: user.uid,  
+        username, 
+        email: emailLower, 
+        state: "pendiente", 
+        rol: "visitante", 
+        createdAt: new Date(),  // Corregido: era newDate()
+        method: "password"
+      });
+
+      Swal.fire("¡Éxito!", "Usuario creado correctamente", "success");
+      navigate("/");
+
+    } catch (error) {
+      console.error("Error de registro: ", error);
+
+      if (error.code === "auth/email-already-in-use") {
+        Swal.fire("Error", "Este correo electrónico ya está en uso", "error");
+      } else if (error.code === "auth/invalid-email") {
+        Swal.fire("Error", "El correo electrónico no es válido", "error");
+      } else {
+        Swal.fire("Error", "Ocurrió un error durante el registro", "error");
+      }
+    }
+
+  }
+
   return (
     <section className="flex items-center justify-center min-h-screen bg-[#f0f0f0]">
       <div className="w-full max-w-md bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20">
@@ -15,7 +94,7 @@ function RegisterPage() {
           REGISTRARSE
         </h2>
 
-        <form className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-5">
           
           <label className=" w-full input input-bordered rounded-2xl border-black flex items-center gap-2 bg-white/10 text-black placeholder-black">
             <svg
@@ -36,6 +115,7 @@ function RegisterPage() {
             </svg>
             <input
               type="text"
+              name="username"
               required
               placeholder="Username"
               pattern="[A-Za-z][A-Za-z0-9\-]*"
@@ -43,6 +123,8 @@ function RegisterPage() {
               maxLength="30"
               title="Only letters, numbers or dash"
               className="grow bg-transparent focus:outline-none"
+              value={formData.username}
+              onChange={handleChange}
             />
           </label>
 
@@ -65,10 +147,13 @@ function RegisterPage() {
               </g>
             </svg>
             <input
+            name="email"
               type="email"
               placeholder="example@gmail.com"
               required
               className="grow bg-transparent focus:outline-none"
+              value={formData.email}
+              onChange={handleChange}
             />
           </label>
 
@@ -91,14 +176,24 @@ function RegisterPage() {
               </g>
             </svg>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
+              name="password"
               required
               placeholder="Password"
-              minLength="8"
-              pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
-              title="Must be more than 8 characters, including number, lowercase letter, uppercase letter"
+              minLength="6"
+              // pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+              // title="Must be more than 8 characters, including number, lowercase letter, uppercase letter"
               className="grow bg-transparent focus:outline-none"
+              value={formData.password}
+              onChange={handleChange}
             />
+            <button
+              type="button"
+              className="p-2 text-gray-500 hover:text-gray-700 focus:outline-none transition-colors"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <FaEyeSlash/>: <FaEye/>}
+            </button>
           </label>
 
            <label className="w-full input input-bordered rounded-2xl border-black flex items-center gap-2 bg-white/10 text-black placeholder-black">
@@ -120,12 +215,15 @@ function RegisterPage() {
             </svg>
             <input
               type="password"
+              name="confirmPassword"
               required
               placeholder="Confirm Password"
-              minLength="8"
-              pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
-              title="Must be more than 8 characters, including number, lowercase letter, uppercase letter"
+              minLength="6"
+              // pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+              // title="Must be more than 8 characters, including number, lowercase letter, uppercase letter"
               className="grow bg-transparent focus:outline-none"
+              value={formData.confirmPassword}
+              onChange={handleChange}
             />
           </label>
 
@@ -133,6 +231,7 @@ function RegisterPage() {
           <button
             type="submit"
             className="btn btn-dash btn-info w-full rounded-xl shadow-lg transition-all duration-500 hover:scale-105"
+
           >
             Registrarse
           </button>
@@ -140,12 +239,12 @@ function RegisterPage() {
 
         <p className="mt-6 text-sm text-center text-black">
           ¿Ya tienes cuenta?{" "}
-          <a
-            href="/"
+          <Link
+            to="/login"
             className="font-medium text-blue-400 hover:text-blue-300 hover:underline"
           >
             Inicia sesión
-          </a>
+          </Link>
         </p>
 
         

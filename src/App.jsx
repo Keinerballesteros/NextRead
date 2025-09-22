@@ -31,7 +31,7 @@ function App() {
     <>
      <BrowserRouter>
     <Routes>
-      <Route path='/' element={<HomeHooks/>}/>
+      <Route path='/home' element={<HomeHooks/>}/>
       <Route path='/usestate' element={<HookUseState/>}/>
       <Route path='/usecallback' element={<HookCallback/>}/> 
       <Route path='/usecontext' element={<HookUseContext/>}/> 
@@ -53,7 +53,7 @@ function App() {
       <Route path='/register' element={<RegisterPage/>}/>
       <Route path='/confirm' element={<ConfirmEmailPage/>}/>
       <Route path='/change' element={<ChangePassword/>}/>
-      <Route path='/dashboard' element={<DashboardPage/>}/>
+      <Route path='/' element={<DashboardPage/>}/>
     </Routes>
     </BrowserRouter>
     </>

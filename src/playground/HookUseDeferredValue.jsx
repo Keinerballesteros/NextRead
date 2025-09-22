@@ -10,7 +10,7 @@ function HookUseDeferredValue() {
         <input type="text" className='input input-info' value={text} onChange={(e) => setText(e.target.value)}/>
         <SlowList query={deferredValue} />
 
-         <Link to="/" className="btn btn-dash w-28 justify-center link-accent mt-2">Ir al Home</Link>
+         <Link to="/home" className="btn btn-dash w-28 justify-center link-accent mt-2">Ir al Home</Link>
         </div>
     )
 } 

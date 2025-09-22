@@ -29,7 +29,7 @@ function Counter() {
             </div>
             
             <div className="bg-white rounded p-2 text-black">
-                <Link to="/">Volver a Home</Link>
+                <Link to="/home">Volver a Home</Link>
             </div>
         </div>
     </div>
