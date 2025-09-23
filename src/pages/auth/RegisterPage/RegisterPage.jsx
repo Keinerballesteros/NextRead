@@ -10,8 +10,7 @@ function RegisterPage() {
 const navigate = useNavigate();
 
 const [showPassword, setShowPassword] = useState(false);
-
-
+const [showPassword2, setShowPassword2] = useState(false);
 
   const [formData, setFormData] = useState({
     username: "", 
@@ -214,7 +213,7 @@ const [showPassword, setShowPassword] = useState(false);
               </g>
             </svg>
             <input
-              type="password"
+              type={showPassword2 ? "text" : "password"}
               name="confirmPassword"
               required
               placeholder="Confirm Password"
@@ -225,6 +224,13 @@ const [showPassword, setShowPassword] = useState(false);
               value={formData.confirmPassword}
               onChange={handleChange}
             />
+             <button
+              type="button"
+              className="p-2 text-gray-500 hover:text-gray-700 focus:outline-none transition-colors"
+              onClick={() => setShowPassword2(!showPassword2)}
+            >
+              {showPassword2 ? <FaEyeSlash/>: <FaEye/>}
+            </button>
           </label>
 
           
