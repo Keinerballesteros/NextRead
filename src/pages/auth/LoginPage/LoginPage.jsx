@@ -1,11 +1,42 @@
 import { useState } from "react";
-import { auth } from "../../../firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth, GoogleProvider, db } from "../../../firebase";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 function LoginPage() {
+
+
+  const loginWithGoogle = async () =>{
+    try{
+      const userCredential = await signInWithPopup(auth, GoogleProvider);
+      const user = userCredential.user;
+      Swal.fire("¡Éxito!", "Sesión iniciada correctamente", "success");
+        navigate("/");
+    }
+    catch(error){
+      console.error("Error de autenticación", error);
+
+      if (error.code === "auth/invalid-email") {
+        Swal.fire("Error", "El correo electrónico no es válido", "error");
+      } else if (error.code === "auth/user-not-found") {
+        Swal.fire("Error", "No existe un usuario con este correo", "error");
+      } else if (error.code === "auth/wrong-password") {
+        Swal.fire("Error", "Contraseña incorrecta", "error");
+      } else if (error.code === "auth/too-many-requests") {
+        Swal.fire(
+          "Error",
+          "Demasiados intentos fallidos. Intenta más tarde",
+          "error"
+        );
+      } else {
+        Swal.fire("Error", "Ocurrió un error al iniciar sesión, Revise las Credenciales Ingresadas", "error");
+      }
+    }
+  }
+
+
   const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
@@ -180,6 +211,7 @@ function LoginPage() {
 
           <button
             type="button"
+            onClick={loginWithGoogle}
             className="btn w-full rounded-xl shadow-lg transition-all duration-500 hover:scale-105 bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
           >
             <div className="flex items-center justify-center gap-2">
