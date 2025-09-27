@@ -1,6 +1,6 @@
 
 import { initializeApp } from "firebase/app";
-import {getAuth, GoogleAuthProvider, signOut} from 'firebase/auth';
+import {getAuth, GoogleAuthProvider, FacebookAuthProvider, signOut, GithubAuthProvider} from 'firebase/auth';
 import { getFirestore } from "firebase/firestore";
 
 
@@ -21,10 +21,12 @@ const app = initializeApp(firebaseConfig);
 //Variable para obtener funcionalidad de Autenticación
 const auth = getAuth(app);
 const GoogleProvider = new GoogleAuthProvider();
+const githubProvider = new GithubAuthProvider();
+const facebookProvider = new FacebookAuthProvider();
 
 
 // Conexión a db
 const db = getFirestore(app);
 
 //Exportar variables para consumo del proyecto
-export {auth, GoogleProvider, db, signOut};
+export {auth, GoogleProvider, githubProvider, facebookProvider, db, signOut};
