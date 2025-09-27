@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { auth, GoogleProvider, db } from "../../../firebase";
+import { auth, GoogleProvider, db, githubProvider, facebookProvider } from "../../../firebase";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
@@ -32,9 +32,49 @@ function LoginPage() {
         );
       } else {
         Swal.fire("Error", "Ocurrió un error al iniciar sesión, Revise las Credenciales Ingresadas", "error");
+        
       }
     }
   }
+
+  const loginWithGithub = async () => {
+    try{
+      const result = await signInWithPopup(auth, githubProvider);
+      console.log(result.user);
+      Swal.fire("¡Éxito!", "Sesión iniciada con Github correctamente", "success");
+        navigate("/");
+    }catch(error){
+        console.error("Error de autenticación", error);
+
+        if (error.code === "auth/invalid-email") {
+          Swal.fire("Error", "El correo electrónico no es válido", "error");
+        } else if (error.code === "auth/user-not-found") {
+          Swal.fire("Error", "No existe un usuario con este correo", "error");
+        } else if (error.code === "auth/wrong-password") {
+          Swal.fire("Error", "Contraseña incorrecta", "error");
+        } else if (error.code === "auth/too-many-requests") {
+          Swal.fire(
+            "Error",
+            "Demasiados intentos fallidos. Intenta más tarde",
+            "error"
+          );
+        } else {
+          Swal.fire("Error", "Ocurrió un error al iniciar sesión, Revise las Credenciales Ingresadas", "error");
+          
+        }
+    }
+  }
+  
+  const loginWithFacebook = async () => {
+    try {
+      const result = await signInWithPopup(auth, facebookProvider);
+      console.log(result.user);
+      Swal.fire("¡Éxito!", "Sesión iniciada correctamente", "success");
+        navigate("/");
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
 
   const [showPassword, setShowPassword] = useState(false);
@@ -194,6 +234,7 @@ function LoginPage() {
 
           <button
             type="button"
+            onClick={loginWithGithub}
             className="btn w-full rounded-xl shadow-lg transition-all duration-500 hover:scale-105 bg-gray-900 text-white border-none hover:bg-gray-800"
           >
             <div className="flex items-center justify-center gap-2">
@@ -243,6 +284,7 @@ function LoginPage() {
 
           <button
             type="button"
+            onClick={loginWithFacebook}
             className="btn w-full rounded-xl shadow-lg transition-all duration-500 hover:scale-105 bg-blue-600 text-white border-none hover:bg-blue-700"
           >
             <div className="flex items-center justify-center gap-2">
