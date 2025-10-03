@@ -43,7 +43,7 @@
 
                 Swal.fire("¡Éxito!", "Tu opinión se ha guardado correctamente ✅", "success");
 
-                // limpiar inputs
+                
                 setFormData({
                 username: "",
                 book: "",
@@ -97,6 +97,7 @@
                         placeholder="Comparte tu nombre..."
                         minLength="3"
                         maxLength="30"
+                        autocomplete="off"
                         className="grow bg-transparent focus:outline-none"
                         value={formData.username}
                         onChange={handleChange}
@@ -119,6 +120,7 @@
                         placeholder="Nombre del Libro..."
                         minLength="3"
                         maxLength="30"
+                        autocomplete="off"
                         title="Only letters, numbers or dash"
                         className="grow bg-transparent focus:outline-none"
                         value={formData.book}
