@@ -21,7 +21,7 @@ function OpinionsList() {
     return () => unsubscribe();
   }, []);
 
-  // Eliminar
+  
   const handleDelete = async (id) => {
     if (window.confirm("¿Seguro que deseas eliminar esta opinión?")) {
       await deleteDoc(doc(db, "Opinions", id));
@@ -39,7 +39,10 @@ function OpinionsList() {
         <p className="text-black p-2 text-center">
           Aquí puedes encontrar todas las opiniones de diferentes lectores, aprovecha y revisa un poco, ¡capáz alguna te interese!
         </p>
-        <div className="flex justify-end">
+        <div className="flex justify-between">
+            <Link to="/" className="text-center text-black border-blue-600 border-2 p-2 bg-gray-100 hover:bg-gray-200 mb-2 rounded">
+              Volver a Home
+            </Link>
             <Link to="/createopinion" className="text-center text-white p-2 bg-blue-600 hover:bg-blue-500 mb-2 rounded">
               + Crear Opinión
             </Link>
@@ -65,7 +68,7 @@ function OpinionsList() {
                   {opinion.date?.toDate().toLocaleDateString()}
                 </p>
 
-                {/* Botones de acción */}
+
                 <div className="flex gap-2 mt-3">
                   <button
                     onClick={() => navigate(`/opinions/${opinion.id}`)}
