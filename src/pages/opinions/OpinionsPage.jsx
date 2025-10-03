@@ -176,7 +176,7 @@
                     >
                         Enviar Opinión
                     </button>
-                    <Link to="/opinionslist" className="font-medium text-gray-600 hover:text-gray-300 hover:underline text-center"> 
+                    <Link to="/opinions" className="font-medium text-gray-600 hover:text-gray-300 hover:underline text-center"> 
                         Ver Opiniones
                     </Link>
                     </form>
