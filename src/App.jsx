@@ -24,6 +24,9 @@ import HookUseActionsState from './playground/HookUseActionState'
 import HookUseSyncExternalStore from './playground/HookUseSyncExternalStore'
 import HookUseTransition from './playground/HookUseTransition'
 import DashboardPage from './pages/DashboardPage'
+import CreateBook from './pages/books/CreateBookPage'
+import EditBook from './pages/books/EditBookPage'
+import BookList from './pages/books/BookListPage'
 function App() {
   
 
@@ -54,6 +57,9 @@ function App() {
       <Route path='/confirm' element={<ConfirmEmailPage/>}/>
       <Route path='/change' element={<ChangePassword/>}/>
       <Route path='/' element={<DashboardPage/>}/>
+      <Route path="/books" element={<BookList />} />
+      <Route path="/create" element={<CreateBook />} />
+      <Route path="/edit-book/:id" element={<EditBook />} />
     </Routes>
     </BrowserRouter>
     </>
