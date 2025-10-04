@@ -27,6 +27,11 @@ import DashboardPage from './pages/DashboardPage'
 import CreateBook from './pages/books/CreateBookPage'
 import EditBook from './pages/books/EditBookPage'
 import BookList from './pages/books/BookListPage'
+import OpinionsPage from './pages/opinions/OpinionsPage'
+import OpinionsList from './pages/opinions/OpinionsListPage'
+import DetailOpinion from './pages/opinions/DetailOpinionPage'
+import EditOpinion from './pages/opinions/EditOpinionPage'
+
 function App() {
   
 
@@ -60,6 +65,10 @@ function App() {
       <Route path="/books" element={<BookList />} />
       <Route path="/create" element={<CreateBook />} />
       <Route path="/edit-book/:id" element={<EditBook />} />
+      <Route path='/createopinion' element={<OpinionsPage/>}/>
+      <Route path='/opinions' element={<OpinionsList/>}/>
+      <Route path="/opinions/:id" element={<DetailOpinion />} />
+      <Route path="/opinions/edit/:id" element={<EditOpinion />} />
     </Routes>
     </BrowserRouter>
     </>

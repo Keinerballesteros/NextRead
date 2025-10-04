@@ -25,22 +25,28 @@ function Header() {
           </button>
         </Link>
 
-        <Link to="/books">
+        <Link to="/opinions">
           <button className="btn bg-blue-500 hover:bg-blue-600 text-white border-none">
             <FaComments className="mr-2" />
             Opinar Libro
           </button>
         </Link>
 
-        <button className="btn btn-ghost text-black hover:bg-blue-100">
-          <FaUser className="mr-2" />
-          Iniciar Sesión
-        </button>
-
-        <button className="btn bg-white text-black border-blue-500 hover:bg-blue-50">
-          <FaUserPlus className="mr-2" />
-          Registrarse
-        </button>
+        <Link to="/login">
+          <button className="btn btn-ghost text-black hover:bg-blue-100">
+            <FaUser className="mr-2" />
+            Iniciar Sesión
+          </button>
+        </Link>
+        
+        
+        <Link to="/register">
+          <button className="btn bg-white text-black border-blue-500 hover:bg-blue-50">
+            <FaUserPlus className="mr-2" />
+            Registrarse
+          </button>
+        </Link>
+        
       </div>
     </div>
   );

@@ -1,3 +1,6 @@
+
+import { Link } from "react-router-dom";
+
 function ConfirmEmailPage() {
   return (
     <section className="flex items-center justify-center min-h-screen bg-[#f0f0f0]">
@@ -42,13 +45,15 @@ function ConfirmEmailPage() {
             />
           </label>
 
+          <Link to="/change">
+            <button
+              type="submit"
+              className="btn btn-dash btn-info w-full rounded-xl shadow-lg transition-all duration-500 hover:scale-105"
+            >
+              Enviar Correo
+            </button>
+          </Link>
           
-          <button
-            type="submit"
-            className="btn btn-dash btn-info w-full rounded-xl shadow-lg transition-all duration-500 hover:scale-105"
-          >
-            Enviar Correo
-          </button>
         </form>
       </div>
     </section>
