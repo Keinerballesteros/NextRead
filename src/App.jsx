@@ -31,6 +31,7 @@ import OpinionsPage from './pages/opinions/OpinionsPage'
 import OpinionsList from './pages/opinions/OpinionsListPage'
 import DetailOpinion from './pages/opinions/DetailOpinionPage'
 import EditOpinion from './pages/opinions/EditOpinionPage'
+import AdminUsersPage from './pages/sessions/AdminUsersPage'
 
 function App() {
   
@@ -69,6 +70,7 @@ function App() {
       <Route path='/opinions' element={<OpinionsList/>}/>
       <Route path="/opinions/:id" element={<DetailOpinion />} />
       <Route path="/opinions/edit/:id" element={<EditOpinion />} />
+      <Route path="/admin/users" element={<AdminUsersPage />} />
     </Routes>
     </BrowserRouter>
     </>

@@ -1,16 +1,23 @@
 import { useState } from "react";
-import {Link,useNavigate } from "react-router-dom";
-import {auth, db} from '../../../firebase'
+import { Link, useNavigate } from "react-router-dom";
+import { auth, db, GoogleProvider, githubProvider, facebookProvider } from '../../../firebase';
 import { doc, setDoc } from "firebase/firestore";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { 
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  fetchSignInMethodsForEmail,
+  linkWithCredential,
+  EmailAuthProvider
+} from "firebase/auth";
 import Swal from "sweetalert2";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { handleSocialLogin } from "../../../services/authService";
 
 function RegisterPage() {
-const navigate = useNavigate();
+  const navigate = useNavigate();
 
-const [showPassword, setShowPassword] = useState(false);
-const [showPassword2, setShowPassword2] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
 
   const [formData, setFormData] = useState({
     username: "", 
@@ -24,6 +31,24 @@ const [showPassword2, setShowPassword2] = useState(false);
       ...formData,  
       [e.target.name]: e.target.value
     });
+  };
+
+  // Función para guardar datos en Firestore
+  const saveUserToFirestore = async (user, username, method = "password") => {
+    try {
+      await setDoc(doc(db, "Users", user.uid), {
+        uid: user.uid,  
+        username, 
+        email: user.email, 
+        state: "pendiente", 
+        rol: "visitante", 
+        createdAt: new Date(),
+        method: method
+      });
+    } catch (error) {
+      console.error("Error guardando en Firestore:", error);
+      throw error;
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -50,15 +75,7 @@ const [showPassword2, setShowPassword2] = useState(false);
       const user = userCredential.user;
 
       // Guardar datos en Firestore
-      await setDoc(doc(db, "Users", user.uid), {
-        uid: user.uid,  
-        username, 
-        email: emailLower, 
-        state: "pendiente", 
-        rol: "visitante", 
-        createdAt: new Date(),  // Corregido: era newDate()
-        method: "password"
-      });
+      await saveUserToFirestore(user, username, "password");
 
       Swal.fire("¡Éxito!", "Usuario creado correctamente", "success");
       navigate("/");
@@ -67,21 +84,179 @@ const [showPassword2, setShowPassword2] = useState(false);
       console.error("Error de registro: ", error);
 
       if (error.code === "auth/email-already-in-use") {
-        Swal.fire("Error", "Este correo electrónico ya está en uso", "error");
+        // Email ya existe, ofrecer vinculación
+        await handleEmailAlreadyInUse(email.toLowerCase(), password, username);
       } else if (error.code === "auth/invalid-email") {
         Swal.fire("Error", "El correo electrónico no es válido", "error");
       } else {
         Swal.fire("Error", "Ocurrió un error durante el registro", "error");
       }
     }
+  };
 
-  }
+  // Manejar caso cuando el email ya existe
+  const handleEmailAlreadyInUse = async (email, password, username) => {
+    try {
+      // Obtener métodos existentes
+      const methods = await fetchSignInMethodsForEmail(auth, email);
+      console.log('Métodos existentes para', email, ':', methods);
+
+      if (methods.length === 0) {
+        // Email enumeration protection activado
+        Swal.fire({
+          icon: 'error',
+          title: 'Email en Uso',
+          text: 'Este correo ya está registrado. Intenta iniciar sesión.',
+          confirmButtonText: 'Ir a Login',
+          showCancelButton: true,
+          cancelButtonText: 'Cancelar'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate('/login');
+          }
+        });
+        return;
+      }
+
+      // Determinar qué métodos tiene
+      const providerNames = methods.map(method => {
+        if (method === 'google.com') return 'Google';
+        if (method === 'facebook.com') return 'Facebook';
+        if (method === 'github.com') return 'GitHub';
+        if (method === 'password') return 'Correo y Contraseña';
+        return method;
+      });
+
+      // Si ya tiene contraseña, no puede vincular otra
+      if (methods.includes('password')) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Email en Uso',
+          text: 'Ya existe una cuenta con correo y contraseña para este email.',
+          confirmButtonText: 'Ir a Login',
+          showCancelButton: true,
+          cancelButtonText: 'Cancelar'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate('/login');
+          }
+        });
+        return;
+      }
+
+      // Preguntar si quiere vincular
+      const result = await Swal.fire({
+        icon: 'question',
+        title: '🔗 Vincular Cuenta',
+        html: `
+          <div style="text-align: left;">
+            <p>Ya tienes una cuenta con <strong>${email}</strong> usando:</p>
+            <ul style="padding-left: 20px; margin: 10px 0;">
+              ${providerNames.map(name => `<li><strong>${name}</strong></li>`).join('')}
+            </ul>
+            <p>¿Deseas agregar <strong>Correo y Contraseña</strong> como método adicional de inicio de sesión?</p>
+            <br>
+            <p style="font-size: 14px; color: #666;">
+              ✅ Podrás iniciar sesión con cualquier método<br>
+              ✅ Mantendrás todos tus datos<br>
+              ✅ Es completamente seguro
+            </p>
+          </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Sí, vincular',
+        cancelButtonText: 'No, cancelar',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        width: '550px'
+      });
+
+      if (!result.isConfirmed) {
+        return;
+      }
+
+      // Mostrar loading
+      Swal.fire({
+        title: 'Vinculando cuenta...',
+        html: 'Por favor inicia sesión con tu método existente',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      // Usuario debe iniciar sesión con su método existente primero
+      let provider;
+      let providerName;
+
+      if (methods.includes('google.com')) {
+        provider = GoogleProvider;
+        providerName = 'Google';
+      } else if (methods.includes('facebook.com')) {
+        provider = facebookProvider;
+        providerName = 'Facebook';
+      } else if (methods.includes('github.com')) {
+        provider = githubProvider;
+        providerName = 'GitHub';
+      }
+
+      // Login con método existente
+      const loginResult = await signInWithPopup(auth, provider);
+      
+      // Crear credencial de email/password
+      const credential = EmailAuthProvider.credential(email, password);
+      
+      // Vincular
+      await linkWithCredential(loginResult.user, credential);
+      
+      // Actualizar Firestore con el username si no existe
+      const userDoc = doc(db, "Users", loginResult.user.uid);
+      await setDoc(userDoc, {
+        username: username
+      }, { merge: true }); // merge: true solo actualiza campos nuevos
+      
+      Swal.close();
+      
+      await Swal.fire({
+        icon: 'success',
+        title: '¡Cuenta Vinculada!',
+        text: 'Ahora puedes iniciar sesión con correo y contraseña también.',
+        confirmButtonText: 'Continuar'
+      });
+
+      navigate('/');
+
+    } catch (linkError) {
+      console.error('Error en vinculación:', linkError);
+      Swal.close();
+
+      if (linkError.code === 'auth/popup-closed-by-user') {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Proceso Cancelado',
+          text: 'Cerraste la ventana de autenticación'
+        });
+      } else if (linkError.code === 'auth/provider-already-linked') {
+        Swal.fire({
+          icon: 'info',
+          title: 'Ya Vinculado',
+          text: 'Este método ya está vinculado a tu cuenta.'
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo vincular la cuenta. ' + linkError.message
+        });
+      }
+    }
+  };
 
   return (
     <section className="flex items-center justify-center min-h-screen bg-[#f0f0f0]">
       <div className="w-full max-w-md bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20">
 
-          <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-6">
           <img 
             src="../../public/logo.png" 
             alt="logo" 
@@ -127,7 +302,6 @@ const [showPassword2, setShowPassword2] = useState(false);
             />
           </label>
 
-          
           <label className="w-full input input-bordered rounded-2xl border-black flex items-center gap-2 bg-white/10 text-black placeholder-black">
             <svg
               className="h-5 opacity-70"
@@ -146,7 +320,7 @@ const [showPassword2, setShowPassword2] = useState(false);
               </g>
             </svg>
             <input
-            name="email"
+              name="email"
               type="email"
               placeholder="example@gmail.com"
               required
@@ -156,7 +330,6 @@ const [showPassword2, setShowPassword2] = useState(false);
             />
           </label>
 
-          
           <label className="w-full input input-bordered rounded-2xl border-black flex items-center gap-2 bg-white/10 text-black placeholder-black">
             <svg
               className="h-5 opacity-70"
@@ -180,8 +353,6 @@ const [showPassword2, setShowPassword2] = useState(false);
               required
               placeholder="Password"
               minLength="6"
-              // pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
-              // title="Must be more than 8 characters, including number, lowercase letter, uppercase letter"
               className="grow bg-transparent focus:outline-none"
               value={formData.password}
               onChange={handleChange}
@@ -191,11 +362,11 @@ const [showPassword2, setShowPassword2] = useState(false);
               className="p-2 text-gray-500 hover:text-gray-700 focus:outline-none transition-colors"
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? <FaEyeSlash/>: <FaEye/>}
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
             </button>
           </label>
 
-           <label className="w-full input input-bordered rounded-2xl border-black flex items-center gap-2 bg-white/10 text-black placeholder-black">
+          <label className="w-full input input-bordered rounded-2xl border-black flex items-center gap-2 bg-white/10 text-black placeholder-black">
             <svg
               className="h-5 opacity-70"
               xmlns="http://www.w3.org/2000/svg"
@@ -218,26 +389,22 @@ const [showPassword2, setShowPassword2] = useState(false);
               required
               placeholder="Confirm Password"
               minLength="6"
-              // pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
-              // title="Must be more than 8 characters, including number, lowercase letter, uppercase letter"
               className="grow bg-transparent focus:outline-none"
               value={formData.confirmPassword}
               onChange={handleChange}
             />
-             <button
+            <button
               type="button"
               className="p-2 text-gray-500 hover:text-gray-700 focus:outline-none transition-colors"
               onClick={() => setShowPassword2(!showPassword2)}
             >
-              {showPassword2 ? <FaEyeSlash/>: <FaEye/>}
+              {showPassword2 ? <FaEyeSlash /> : <FaEye />}
             </button>
           </label>
 
-          
           <button
             type="submit"
             className="btn btn-dash btn-info w-full rounded-xl shadow-lg transition-all duration-500 hover:scale-105"
-
           >
             Registrarse
           </button>
@@ -253,7 +420,6 @@ const [showPassword2, setShowPassword2] = useState(false);
           </Link>
         </p>
 
-        
       </div>
     </section>
   );
