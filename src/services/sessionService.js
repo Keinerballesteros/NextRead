@@ -11,10 +11,10 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase';
 
-// Colección para las sesiones de usuario
+
 const SESSIONS_COLLECTION = 'user_sessions';
 
-// Registrar inicio de sesión
+
 export const registerLogin = async (user) => {
   try {
     const sessionData = {
@@ -36,7 +36,7 @@ export const registerLogin = async (user) => {
   }
 };
 
-// Registrar cierre de sesión
+
 export const registerLogout = async () => {
   try {
     const sessionId = localStorage.getItem('currentSessionId');
@@ -64,20 +64,20 @@ export const registerLogout = async () => {
   }
 };
 
-// Obtener todas las sesiones (para admin)
+
 export const getAllSessions = async (filters = {}) => {
   try {
     let q;
     
-    // Estrategia de consulta basada en los filtros disponibles
+    
     if (filters.userEmail && !filters.startDate && !filters.endDate) {
-      // Solo filtro por email - podemos hacer búsqueda parcial en el cliente
+        
       q = query(
         collection(db, SESSIONS_COLLECTION),
         orderBy('loginTime', 'desc')
       );
     } else if (filters.startDate && !filters.userEmail) {
-      // Solo filtro por fecha
+
       const startDate = new Date(filters.startDate);
       q = query(
         collection(db, SESSIONS_COLLECTION),
@@ -85,7 +85,6 @@ export const getAllSessions = async (filters = {}) => {
         orderBy('loginTime', 'desc')
       );
     } else {
-      // Filtros múltiples o sin filtros - obtener todo y filtrar en cliente
       q = query(
         collection(db, SESSIONS_COLLECTION),
         orderBy('loginTime', 'desc')
@@ -103,7 +102,6 @@ export const getAllSessions = async (filters = {}) => {
       });
     });
 
-    // Aplicar filtros adicionales en el cliente si es necesario
     if (filters.userEmail && filters.userEmail.trim() !== '') {
       const searchTerm = filters.userEmail.toLowerCase();
       sessions = sessions.filter(session => 
@@ -122,7 +120,6 @@ export const getAllSessions = async (filters = {}) => {
       });
     }
 
-    // Si hay ambos filtros (email y fecha), aplicar ambos en cliente
     if (filters.userEmail && (filters.startDate || filters.endDate)) {
       let filteredSessions = sessions;
       
@@ -157,7 +154,6 @@ export const getAllSessions = async (filters = {}) => {
   }
 };
 
-// Obtener sesiones por usuario específico
 export const getUserSessions = async (userId) => {
   try {
     const q = query(

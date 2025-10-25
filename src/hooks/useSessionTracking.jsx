@@ -6,7 +6,6 @@ export const useSessionTracking = () => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
-        // Usuario acaba de iniciar sesión
         console.log('Usuario autenticado, registrando sesión...');
         await registerLogin(user);
       }

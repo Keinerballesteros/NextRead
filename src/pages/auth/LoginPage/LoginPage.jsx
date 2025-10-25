@@ -4,8 +4,8 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { handleSocialLogin } from "../../../services/authService"; // Importar el servicio
-import { useSessionTracking } from "../../../playground/useSessionTracking"; // Importar el hook
+import { handleSocialLogin } from "../../../services/authService"; 
+import { useSessionTracking } from "../../../hooks/useSessionTracking"; 
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -15,17 +15,17 @@ function LoginPage() {
     password: "",
   });
 
-  // Usar el hook de tracking de sesiones
+  
   useSessionTracking();
 
-  // Función genérica para login social
+  
   const handleSocialAuth = async (providerType, providerName) => {
     try {
       const result = await handleSocialLogin(providerType);
       
       if (result.success) {
         if (result.linked) {
-          // Cuenta vinculada exitosamente
+          
           await Swal.fire({
             icon: 'success',
             title: '¡Cuentas Vinculadas!',
@@ -33,7 +33,7 @@ function LoginPage() {
             confirmButtonText: 'Continuar'
           });
         } else {
-          // Login normal exitoso
+          
           await Swal.fire({
             icon: 'success',
             title: '¡Éxito!',
@@ -44,10 +44,9 @@ function LoginPage() {
         }
         navigate("/");
       } else if (result.requiresPassword) {
-        // El usuario necesita iniciar sesión con contraseña primero
-        // El mensaje ya se mostró en el servicio
+        
       } else if (result.cancelled) {
-        // Usuario canceló la vinculación
+        
         await Swal.fire({
           icon: 'info',
           title: 'Vinculación Cancelada',
@@ -59,12 +58,12 @@ function LoginPage() {
     } catch (error) {
       console.error(`Error de autenticación con ${providerName}:`, error);
       
-      // Manejo de errores específicos
+      
       if (error.code === "auth/popup-closed-by-user") {
-        // Usuario cerró el popup, no mostrar error
+        
         return;
       } else if (error.code === "auth/cancelled-popup-request") {
-        // Popup cancelado, no mostrar error
+        
         return;
       } else if (error.code === "auth/popup-blocked") {
         Swal.fire(
@@ -98,7 +97,7 @@ function LoginPage() {
 
     const { email, password } = formData;
 
-    // Validaciones
+    
     if (!email || !password) {
       return Swal.fire("Error", "Todos los campos son obligatorios", "error");
     }
@@ -113,7 +112,7 @@ function LoginPage() {
     try {
       const emailLower = email.toLowerCase();
 
-      // Autenticar usuario con Firebase
+      
       const userCredential = await signInWithEmailAndPassword(
         auth,
         emailLower,
@@ -126,7 +125,7 @@ function LoginPage() {
     } catch (error) {
       console.error("Error de autenticación: ", error);
 
-      // Manejo de errores específicos de Firebase
+      
       if (error.code === "auth/invalid-email") {
         Swal.fire("Error", "El correo electrónico no es válido", "error");
       } else if (error.code === "auth/user-not-found") {
