@@ -16,7 +16,7 @@ const AdminUsersPage = () => {
     direction: 'desc'
   });
 
-  // Cargar sesiones al montar el componente
+  
   useEffect(() => {
     loadSessions();
   }, []);
@@ -37,12 +37,12 @@ const AdminUsersPage = () => {
     }
   };
 
-  // Función para formatear fecha
+  
   const formatDate = (date) => {
     if (!date) return 'N/A';
     
     try {
-      // Manejar tanto Timestamp de Firestore como Date objects
+      
       const dateObj = date.seconds ? new Date(date.seconds * 1000) : new Date(date);
       return dateObj.toLocaleString('es-ES', {
         year: 'numeric',
@@ -58,7 +58,7 @@ const AdminUsersPage = () => {
     }
   };
 
-  // Función para formatear duración
+  
   const formatDuration = (seconds) => {
     if (!seconds) return 'En curso';
     
@@ -75,7 +75,7 @@ const AdminUsersPage = () => {
     }
   };
 
-  // Manejar búsqueda
+  
   const handleSearch = (e) => {
     e.preventDefault();
     const searchFilters = {
@@ -86,7 +86,7 @@ const AdminUsersPage = () => {
     loadSessions(searchFilters);
   };
 
-  // Manejar filtros por fecha
+  
   const handleDateFilter = () => {
     const dateFilters = {
       userEmail: searchTerm,
@@ -98,7 +98,7 @@ const AdminUsersPage = () => {
     loadSessions(dateFilters);
   };
 
-  // Recargar todas las sesiones
+  
   const handleRefresh = () => {
     setSearchTerm('');
     setFilters({
@@ -109,7 +109,7 @@ const AdminUsersPage = () => {
     loadSessions();
   };
 
-  // Limpiar filtros
+  
   const clearFilters = () => {
     setSearchTerm('');
     setFilters({
@@ -120,7 +120,7 @@ const AdminUsersPage = () => {
     loadSessions();
   };
 
-  // Ordenar datos
+  
   const handleSort = (key) => {
     let direction = 'desc';
     if (sortConfig.key === key && sortConfig.direction === 'desc') {
@@ -129,7 +129,7 @@ const AdminUsersPage = () => {
     setSortConfig({ key, direction });
   };
 
-  // Aplicar ordenamiento
+  
   const sortedSessions = [...sessions].sort((a, b) => {
     if (sortConfig.key === 'loginTime' || sortConfig.key === 'logoutTime') {
       try {
@@ -159,7 +159,7 @@ const AdminUsersPage = () => {
       return durationB - durationA;
     }
     
-    // Ordenamiento por texto
+    
     const valueA = (a[sortConfig.key] || '').toString().toLowerCase();
     const valueB = (b[sortConfig.key] || '').toString().toLowerCase();
     
@@ -169,7 +169,7 @@ const AdminUsersPage = () => {
     return valueB.localeCompare(valueA);
   });
 
-  // Obtener icono de ordenamiento
+  
   const getSortIcon = (key) => {
     if (sortConfig.key !== key) return <FaSort className="text-gray-400" />;
     return sortConfig.direction === 'asc' ? 
