@@ -277,7 +277,7 @@ function BookList() {
                   <div className="flex justify-between items-center mb-4">
                     <div className="flex items-center gap-1 text-green-600 font-bold">
                       <FaDollarSign className="h-4 w-4" />
-                      {book.price?.toFixed(2) || "0.00"}
+                      {book.price?.toFixed(0) || "0.00"}
                     </div>
                     <span className="text-sm text-gray-500">
                       {formatDate(book.createdAt)}
@@ -294,7 +294,7 @@ function BookList() {
                             <div class="text-left">
                               <p><strong>Autor:</strong> ${book.author}</p>
                               <p><strong>Categoría:</strong> ${book.category}</p>
-                              <p><strong>Precio:</strong> $${book.price?.toFixed(2) || "0.00"}</p>
+                              <p><strong>Precio:</strong> $${book.price?.toFixed(0) || "0.00"}</p>
                               <p><strong>Descripción:</strong> ${book.description || "Sin descripción"}</p>
                               <p><strong>Publicado:</strong> ${formatDate(book.createdAt)}</p>
                               ${book.hasImages ? `<p><strong>Imágenes:</strong> ${book.imagesCount} subidas</p>` : ""}

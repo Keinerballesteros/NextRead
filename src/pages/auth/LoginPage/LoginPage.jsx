@@ -1,90 +1,89 @@
 import { useState } from "react";
-import { auth, GoogleProvider, db, githubProvider, facebookProvider } from "../../../firebase";
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { auth } from "../../../firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { handleSocialLogin } from "../../../services/authService"; 
+import { useSessionTracking } from "../../../hooks/useSessionTracking"; 
 
 function LoginPage() {
-
-
-  const loginWithGoogle = async () =>{
-    try{
-      const userCredential = await signInWithPopup(auth, GoogleProvider);
-      const user = userCredential.user;
-      Swal.fire("¡Éxito!", "Sesión iniciada correctamente", "success");
-        navigate("/");
-    }
-    catch(error){
-      console.error("Error de autenticación", error);
-
-      if (error.code === "auth/invalid-email") {
-        Swal.fire("Error", "El correo electrónico no es válido", "error");
-      } else if (error.code === "auth/user-not-found") {
-        Swal.fire("Error", "No existe un usuario con este correo", "error");
-      } else if (error.code === "auth/wrong-password") {
-        Swal.fire("Error", "Contraseña incorrecta", "error");
-      } else if (error.code === "auth/too-many-requests") {
-        Swal.fire(
-          "Error",
-          "Demasiados intentos fallidos. Intenta más tarde",
-          "error"
-        );
-      } else {
-        Swal.fire("Error", "Ocurrió un error al iniciar sesión, Revise las Credenciales Ingresadas", "error");
-        
-      }
-    }
-  }
-
-  const loginWithGithub = async () => {
-    try{
-      const result = await signInWithPopup(auth, githubProvider);
-      console.log(result.user);
-      Swal.fire("¡Éxito!", "Sesión iniciada con Github correctamente", "success");
-        navigate("/");
-    }catch(error){
-        console.error("Error de autenticación", error);
-
-        if (error.code === "auth/invalid-email") {
-          Swal.fire("Error", "El correo electrónico no es válido", "error");
-        } else if (error.code === "auth/user-not-found") {
-          Swal.fire("Error", "No existe un usuario con este correo", "error");
-        } else if (error.code === "auth/wrong-password") {
-          Swal.fire("Error", "Contraseña incorrecta", "error");
-        } else if (error.code === "auth/too-many-requests") {
-          Swal.fire(
-            "Error",
-            "Demasiados intentos fallidos. Intenta más tarde",
-            "error"
-          );
-        } else {
-          Swal.fire("Error", "Ocurrió un error al iniciar sesión, Revise las Credenciales Ingresadas", "error");
-          
-        }
-    }
-  }
-  
-  const loginWithFacebook = async () => {
-    try {
-      const result = await signInWithPopup(auth, facebookProvider);
-      console.log(result.user);
-      Swal.fire("¡Éxito!", "Sesión iniciada correctamente", "success");
-        navigate("/");
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-
-  const [showPassword, setShowPassword] = useState(false);
-
   const navigate = useNavigate();
-
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+
+  
+  useSessionTracking();
+
+  
+  const handleSocialAuth = async (providerType, providerName) => {
+    try {
+      const result = await handleSocialLogin(providerType);
+      
+      if (result.success) {
+        if (result.linked) {
+          
+          await Swal.fire({
+            icon: 'success',
+            title: '¡Cuentas Vinculadas!',
+            text: `Tu cuenta de ${result.providerLinked} ha sido vinculada exitosamente. Ahora puedes iniciar sesión con múltiples métodos.`,
+            confirmButtonText: 'Continuar'
+          });
+        } else {
+          
+          await Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: `Sesión iniciada con ${providerName} correctamente`,
+            timer: 1500,
+            showConfirmButton: false
+          });
+        }
+        navigate("/");
+      } else if (result.requiresPassword) {
+        
+      } else if (result.cancelled) {
+        
+        await Swal.fire({
+          icon: 'info',
+          title: 'Vinculación Cancelada',
+          text: 'No se vincularon las cuentas',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }
+    } catch (error) {
+      console.error(`Error de autenticación con ${providerName}:`, error);
+      
+      
+      if (error.code === "auth/popup-closed-by-user") {
+        
+        return;
+      } else if (error.code === "auth/cancelled-popup-request") {
+        
+        return;
+      } else if (error.code === "auth/popup-blocked") {
+        Swal.fire(
+          "Error",
+          "El navegador bloqueó la ventana emergente. Por favor habilita las ventanas emergentes para este sitio.",
+          "error"
+        );
+      } else {
+        Swal.fire(
+          "Error",
+          `Ocurrió un error al iniciar sesión con ${providerName}`,
+          "error"
+        );
+      }
+    }
+  };
+
+  const loginWithGoogle = () => handleSocialAuth('google', 'Google');
+  const loginWithGithub = () => handleSocialAuth('github', 'GitHub');
+  const loginWithFacebook = () => handleSocialAuth('facebook', 'Facebook');
 
   const handleChange = (e) => {
     setFormData({
@@ -98,7 +97,7 @@ function LoginPage() {
 
     const { email, password } = formData;
 
-    // Validaciones
+    
     if (!email || !password) {
       return Swal.fire("Error", "Todos los campos son obligatorios", "error");
     }
@@ -113,7 +112,7 @@ function LoginPage() {
     try {
       const emailLower = email.toLowerCase();
 
-      // Autenticar usuario con Firebase
+      
       const userCredential = await signInWithEmailAndPassword(
         auth,
         emailLower,
@@ -126,7 +125,7 @@ function LoginPage() {
     } catch (error) {
       console.error("Error de autenticación: ", error);
 
-      // Manejo de errores específicos de Firebase
+      
       if (error.code === "auth/invalid-email") {
         Swal.fire("Error", "El correo electrónico no es válido", "error");
       } else if (error.code === "auth/user-not-found") {
