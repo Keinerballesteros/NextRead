@@ -37,7 +37,7 @@ function OpinionsList() {
         
         
         <p className="text-black p-2 text-center">
-          Aquí puedes encontrar todas las opiniones de diferentes lectores, aprovecha y revisa un poco, ¡capáz alguna te interese!
+          Aquí puedes encontrar todas las opiniones de diferentes lectores, aprovecha y revisa un poco, ¡depronto alguna te interese!
         </p>
         <div className="flex justify-between">
             <Link to="/" className="text-center text-black border-blue-600 border-2 p-2 bg-gray-100 hover:bg-gray-200 mb-2 rounded">
