@@ -154,7 +154,7 @@ function EditBook() {
     }
 
     try {
-      // Guardar TODAS las imágenes localmente
+      
       const imagePreviews = images.map(img => img.preview);
       
       const bookData = {
@@ -165,7 +165,7 @@ function EditBook() {
         description: formData.description.trim() || "",
         hasImages: images.length > 0,
         imagesCount: images.length,
-        imagePreviews: imagePreviews, // Guardar TODAS las imágenes
+        imagePreviews: imagePreviews, 
         updatedAt: serverTimestamp(),
       };
 
