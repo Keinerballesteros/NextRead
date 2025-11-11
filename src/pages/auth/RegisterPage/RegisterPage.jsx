@@ -33,7 +33,7 @@ function RegisterPage() {
     });
   };
 
-  // Función para guardar datos en Firestore
+  
   const saveUserToFirestore = async (user, username, method = "password") => {
     try {
       await setDoc(doc(db, "Users", user.uid), {
@@ -70,11 +70,11 @@ function RegisterPage() {
     try {
       const emailLower = email.toLowerCase();
 
-      // Crear usuario para el servicio de Autenticación de Firebase
+      
       const userCredential = await createUserWithEmailAndPassword(auth, emailLower, password);
       const user = userCredential.user;
 
-      // Guardar datos en Firestore
+      
       await saveUserToFirestore(user, username, "password");
 
       Swal.fire("¡Éxito!", "Usuario creado correctamente", "success");
@@ -84,7 +84,7 @@ function RegisterPage() {
       console.error("Error de registro: ", error);
 
       if (error.code === "auth/email-already-in-use") {
-        // Email ya existe, ofrecer vinculación
+        
         await handleEmailAlreadyInUse(email.toLowerCase(), password, username);
       } else if (error.code === "auth/invalid-email") {
         Swal.fire("Error", "El correo electrónico no es válido", "error");
@@ -94,15 +94,15 @@ function RegisterPage() {
     }
   };
 
-  // Manejar caso cuando el email ya existe
+  
   const handleEmailAlreadyInUse = async (email, password, username) => {
     try {
-      // Obtener métodos existentes
+      
       const methods = await fetchSignInMethodsForEmail(auth, email);
       console.log('Métodos existentes para', email, ':', methods);
 
       if (methods.length === 0) {
-        // Email enumeration protection activado
+        
         Swal.fire({
           icon: 'error',
           title: 'Email en Uso',
@@ -118,7 +118,7 @@ function RegisterPage() {
         return;
       }
 
-      // Determinar qué métodos tiene
+      
       const providerNames = methods.map(method => {
         if (method === 'google.com') return 'Google';
         if (method === 'facebook.com') return 'Facebook';
@@ -127,7 +127,7 @@ function RegisterPage() {
         return method;
       });
 
-      // Si ya tiene contraseña, no puede vincular otra
+      
       if (methods.includes('password')) {
         Swal.fire({
           icon: 'error',
@@ -144,7 +144,7 @@ function RegisterPage() {
         return;
       }
 
-      // Preguntar si quiere vincular
+      
       const result = await Swal.fire({
         icon: 'question',
         title: '🔗 Vincular Cuenta',
@@ -175,7 +175,7 @@ function RegisterPage() {
         return;
       }
 
-      // Mostrar loading
+      
       Swal.fire({
         title: 'Vinculando cuenta...',
         html: 'Por favor inicia sesión con tu método existente',
@@ -185,7 +185,7 @@ function RegisterPage() {
         }
       });
 
-      // Usuario debe iniciar sesión con su método existente primero
+      
       let provider;
       let providerName;
 
@@ -200,20 +200,20 @@ function RegisterPage() {
         providerName = 'GitHub';
       }
 
-      // Login con método existente
+      
       const loginResult = await signInWithPopup(auth, provider);
       
-      // Crear credencial de email/password
+      
       const credential = EmailAuthProvider.credential(email, password);
       
-      // Vincular
+      
       await linkWithCredential(loginResult.user, credential);
       
-      // Actualizar Firestore con el username si no existe
+      
       const userDoc = doc(db, "Users", loginResult.user.uid);
       await setDoc(userDoc, {
         username: username
-      }, { merge: true }); // merge: true solo actualiza campos nuevos
+      }, { merge: true }); 
       
       Swal.close();
       
@@ -258,7 +258,7 @@ function RegisterPage() {
 
         <div className="flex justify-center mb-6">
           <img 
-            src="../../public/logo.png" 
+            src="/logo.png" 
             alt="logo" 
             className="w-40 h-40 rounded-2xl" 
           />

@@ -11,16 +11,21 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase';
 
-
 const SESSIONS_COLLECTION = 'user_sessions';
 
 
 export const registerLogin = async (user) => {
   try {
+    
+    const providers = user.providerData.map(profile => profile.providerId);
+    
+    console.log('Registrando login con proveedores:', providers);
+    
     const sessionData = {
       userId: user.uid,
       userEmail: user.email,
       userName: user.displayName || user.email.split('@')[0],
+      providers: providers, 
       loginTime: new Date(),
       logoutTime: null,
       duration: null,
@@ -29,6 +34,8 @@ export const registerLogin = async (user) => {
 
     const docRef = await addDoc(collection(db, SESSIONS_COLLECTION), sessionData);
     localStorage.setItem('currentSessionId', docRef.id);
+    
+    console.log('Sesión registrada con ID:', docRef.id);
     return docRef.id;
   } catch (error) {
     console.error('Error registrando inicio de sesión:', error);
@@ -40,7 +47,10 @@ export const registerLogin = async (user) => {
 export const registerLogout = async () => {
   try {
     const sessionId = localStorage.getItem('currentSessionId');
-    if (!sessionId) return;
+    if (!sessionId) {
+      console.log('No hay sesión activa para cerrar');
+      return;
+    }
 
     const sessionRef = doc(db, SESSIONS_COLLECTION, sessionId);
     const logoutTime = new Date();
@@ -58,6 +68,7 @@ export const registerLogout = async () => {
       });
 
       localStorage.removeItem('currentSessionId');
+      console.log('Sesión cerrada correctamente');
     }
   } catch (error) {
     console.error('Error registrando cierre de sesión:', error);
@@ -71,13 +82,11 @@ export const getAllSessions = async (filters = {}) => {
     
     
     if (filters.userEmail && !filters.startDate && !filters.endDate) {
-        
       q = query(
         collection(db, SESSIONS_COLLECTION),
         orderBy('loginTime', 'desc')
       );
     } else if (filters.startDate && !filters.userEmail) {
-
       const startDate = new Date(filters.startDate);
       q = query(
         collection(db, SESSIONS_COLLECTION),
@@ -98,10 +107,13 @@ export const getAllSessions = async (filters = {}) => {
       const data = doc.data();
       sessions.push({
         id: doc.id,
-        ...data
+        ...data,
+        
+        providers: data.providers || []
       });
     });
 
+    
     if (filters.userEmail && filters.userEmail.trim() !== '') {
       const searchTerm = filters.userEmail.toLowerCase();
       sessions = sessions.filter(session => 
@@ -109,6 +121,7 @@ export const getAllSessions = async (filters = {}) => {
       );
     }
 
+    
     if (filters.endDate && !filters.userEmail) {
       const endDate = new Date(filters.endDate);
       endDate.setHours(23, 59, 59, 999);
@@ -120,6 +133,7 @@ export const getAllSessions = async (filters = {}) => {
       });
     }
 
+    
     if (filters.userEmail && (filters.startDate || filters.endDate)) {
       let filteredSessions = sessions;
       
@@ -147,12 +161,14 @@ export const getAllSessions = async (filters = {}) => {
       sessions = filteredSessions;
     }
 
+    console.log(`Se encontraron ${sessions.length} sesiones`);
     return sessions;
   } catch (error) {
     console.error('Error obteniendo sesiones:', error);
     return [];
   }
 };
+
 
 export const getUserSessions = async (userId) => {
   try {
@@ -166,9 +182,11 @@ export const getUserSessions = async (userId) => {
     const sessions = [];
     
     querySnapshot.forEach((doc) => {
+      const data = doc.data();
       sessions.push({
         id: doc.id,
-        ...doc.data()
+        ...data,
+        providers: data.providers || []
       });
     });
     

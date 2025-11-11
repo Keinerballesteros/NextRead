@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getAllSessions } from '../../services/sessionService';
-import { FaSearch, FaSort, FaSortUp, FaSortDown, FaUsers, FaCalendar, FaSync } from 'react-icons/fa';
+import { FaSearch, FaSort, FaSortUp, FaSortDown, FaUsers, FaCalendar, FaSync, FaGoogle, FaGithub, FaFacebook, FaEnvelope } from 'react-icons/fa';
 
 const AdminUsersPage = () => {
   const [sessions, setSessions] = useState([]);
@@ -16,7 +16,6 @@ const AdminUsersPage = () => {
     direction: 'desc'
   });
 
-  
   useEffect(() => {
     loadSessions();
   }, []);
@@ -37,12 +36,10 @@ const AdminUsersPage = () => {
     }
   };
 
-  
   const formatDate = (date) => {
     if (!date) return 'N/A';
     
     try {
-      
       const dateObj = date.seconds ? new Date(date.seconds * 1000) : new Date(date);
       return dateObj.toLocaleString('es-ES', {
         year: 'numeric',
@@ -58,7 +55,6 @@ const AdminUsersPage = () => {
     }
   };
 
-  
   const formatDuration = (seconds) => {
     if (!seconds) return 'En curso';
     
@@ -76,6 +72,74 @@ const AdminUsersPage = () => {
   };
 
   
+  const getProviderInfo = (providerId) => {
+    const providers = {
+      'google.com': {
+        icon: FaGoogle,
+        color: 'text-red-500',
+        bg: 'bg-red-50',
+        name: 'Google'
+      },
+      'github.com': {
+        icon: FaGithub,
+        color: 'text-gray-800',
+        bg: 'bg-gray-100',
+        name: 'GitHub'
+      },
+      'facebook.com': {
+        icon: FaFacebook,
+        color: 'text-blue-600',
+        bg: 'bg-blue-50',
+        name: 'Facebook'
+      },
+      'password': {
+        icon: FaEnvelope,
+        color: 'text-purple-600',
+        bg: 'bg-purple-50',
+        name: 'Email'
+      }
+    };
+
+    return providers[providerId] || {
+      icon: FaEnvelope,
+      color: 'text-gray-600',
+      bg: 'bg-gray-50',
+      name: providerId
+    };
+  };
+
+  
+  const renderProviders = (providers) => {
+    if (!providers || providers.length === 0) {
+      return (
+        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-gray-100 text-gray-600 text-xs">
+          <FaEnvelope className="text-xs" />
+          <span>Desconocido</span>
+        </span>
+      );
+    }
+
+    return (
+      <div className="flex flex-wrap gap-1">
+        {providers.map((providerId, index) => {
+          const providerInfo = getProviderInfo(providerId);
+          const Icon = providerInfo.icon;
+          
+          return (
+            <span
+              key={index}
+              className={`inline-flex items-center gap-1 px-2 py-1 rounded-md ${providerInfo.bg} ${providerInfo.color} text-xs font-medium`}
+              title={providerInfo.name}
+            >
+              <Icon className="text-xs" />
+              <span>{providerInfo.name}</span>
+            </span>
+          );
+        })}
+      </div>
+    );
+  };
+
   const handleSearch = (e) => {
     e.preventDefault();
     const searchFilters = {
@@ -86,7 +150,6 @@ const AdminUsersPage = () => {
     loadSessions(searchFilters);
   };
 
-  
   const handleDateFilter = () => {
     const dateFilters = {
       userEmail: searchTerm,
@@ -98,7 +161,6 @@ const AdminUsersPage = () => {
     loadSessions(dateFilters);
   };
 
-  
   const handleRefresh = () => {
     setSearchTerm('');
     setFilters({
@@ -109,7 +171,6 @@ const AdminUsersPage = () => {
     loadSessions();
   };
 
-  
   const clearFilters = () => {
     setSearchTerm('');
     setFilters({
@@ -120,7 +181,6 @@ const AdminUsersPage = () => {
     loadSessions();
   };
 
-  
   const handleSort = (key) => {
     let direction = 'desc';
     if (sortConfig.key === key && sortConfig.direction === 'desc') {
@@ -129,7 +189,6 @@ const AdminUsersPage = () => {
     setSortConfig({ key, direction });
   };
 
-  
   const sortedSessions = [...sessions].sort((a, b) => {
     if (sortConfig.key === 'loginTime' || sortConfig.key === 'logoutTime') {
       try {
@@ -159,7 +218,6 @@ const AdminUsersPage = () => {
       return durationB - durationA;
     }
     
-    
     const valueA = (a[sortConfig.key] || '').toString().toLowerCase();
     const valueB = (b[sortConfig.key] || '').toString().toLowerCase();
     
@@ -169,7 +227,6 @@ const AdminUsersPage = () => {
     return valueB.localeCompare(valueA);
   });
 
-  
   const getSortIcon = (key) => {
     if (sortConfig.key !== key) return <FaSort className="text-gray-400" />;
     return sortConfig.direction === 'asc' ? 
@@ -323,6 +380,9 @@ const AdminUsersPage = () => {
                       {getSortIcon('userEmail')}
                     </div>
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Proveedores
+                  </th>
                   <th 
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('loginTime')}
@@ -365,6 +425,9 @@ const AdminUsersPage = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900 font-mono">{session.userEmail}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      {renderProviders(session.providers)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
