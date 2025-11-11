@@ -32,6 +32,7 @@ import OpinionsList from './pages/opinions/OpinionsListPage'
 import DetailOpinion from './pages/opinions/DetailOpinionPage'
 import EditOpinion from './pages/opinions/EditOpinionPage'
 import AdminUsersPage from './pages/sessions/AdminUsersPage'
+import LinkProvidersPage from './pages/sessions/LinkProvidersPage'
 
 function App() {
   
@@ -71,6 +72,7 @@ function App() {
       <Route path="/opinions/:id" element={<DetailOpinion />} />
       <Route path="/opinions/edit/:id" element={<EditOpinion />} />
       <Route path="/admin/users" element={<AdminUsersPage />} />
+      <Route path="/settings" element={<LinkProvidersPage/>} />
     </Routes>
     </BrowserRouter>
     </>
