@@ -4,7 +4,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { handleSocialLogin } from "../../../services/authService"; 
+import { handleSocialLogin, checkEmailBeforeGoogleLogin } from "../../../services/authService"; 
 import { useSessionTracking } from "../../../hooks/useSessionTracking"; 
 
 function LoginPage() {
@@ -15,7 +15,6 @@ function LoginPage() {
     password: "",
   });
 
-  
   useSessionTracking();
 
   
@@ -25,7 +24,6 @@ function LoginPage() {
       
       if (result.success) {
         if (result.linked) {
-          
           await Swal.fire({
             icon: 'success',
             title: '¡Cuentas Vinculadas!',
@@ -33,7 +31,6 @@ function LoginPage() {
             confirmButtonText: 'Continuar'
           });
         } else {
-          
           await Swal.fire({
             icon: 'success',
             title: '¡Éxito!',
@@ -46,7 +43,6 @@ function LoginPage() {
       } else if (result.requiresPassword) {
         
       } else if (result.cancelled) {
-        
         await Swal.fire({
           icon: 'info',
           title: 'Vinculación Cancelada',
@@ -58,12 +54,8 @@ function LoginPage() {
     } catch (error) {
       console.error(`Error de autenticación con ${providerName}:`, error);
       
-      
-      if (error.code === "auth/popup-closed-by-user") {
-        
-        return;
-      } else if (error.code === "auth/cancelled-popup-request") {
-        
+      if (error.code === "auth/popup-closed-by-user" || 
+          error.code === "auth/cancelled-popup-request") {
         return;
       } else if (error.code === "auth/popup-blocked") {
         Swal.fire(
@@ -81,7 +73,56 @@ function LoginPage() {
     }
   };
 
-  const loginWithGoogle = () => handleSocialAuth('google', 'Google');
+  
+  const loginWithGoogle = async () => {
+    try {
+      const result = await checkEmailBeforeGoogleLogin();
+      
+      if (result.success) {
+        if (result.linked) {
+          await Swal.fire({
+            icon: 'success',
+            title: '¡Cuentas Vinculadas!',
+            text: 'Tu cuenta de Google ha sido vinculada exitosamente. Ahora puedes iniciar sesión con múltiples métodos.',
+            confirmButtonText: 'Continuar'
+          });
+        } else {
+          await Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: 'Sesión iniciada con Google correctamente',
+            timer: 1500,
+            showConfirmButton: false
+          });
+        }
+        navigate("/");
+      } else if (result.requiresPassword) {
+        
+      } else if (result.cancelled) {
+        
+      }
+    } catch (error) {
+      console.error('Error con Google:', error);
+      
+      if (error.code === "auth/popup-closed-by-user" || 
+          error.code === "auth/cancelled-popup-request") {
+        return;
+      } else if (error.code === "auth/popup-blocked") {
+        Swal.fire(
+          "Error",
+          "El navegador bloqueó la ventana emergente. Por favor habilita las ventanas emergentes para este sitio.",
+          "error"
+        );
+      } else {
+        Swal.fire(
+          "Error",
+          "Ocurrió un error al iniciar sesión con Google",
+          "error"
+        );
+      }
+    }
+  };
+
   const loginWithGithub = () => handleSocialAuth('github', 'GitHub');
   const loginWithFacebook = () => handleSocialAuth('facebook', 'Facebook');
 
@@ -97,7 +138,6 @@ function LoginPage() {
 
     const { email, password } = formData;
 
-    
     if (!email || !password) {
       return Swal.fire("Error", "Todos los campos son obligatorios", "error");
     }
@@ -112,7 +152,6 @@ function LoginPage() {
     try {
       const emailLower = email.toLowerCase();
 
-      
       const userCredential = await signInWithEmailAndPassword(
         auth,
         emailLower,
@@ -125,7 +164,6 @@ function LoginPage() {
     } catch (error) {
       console.error("Error de autenticación: ", error);
 
-      
       if (error.code === "auth/invalid-email") {
         Swal.fire("Error", "El correo electrónico no es válido", "error");
       } else if (error.code === "auth/user-not-found") {
@@ -149,7 +187,7 @@ function LoginPage() {
       <div className="w-full max-w-md bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20">
         <div className="flex justify-center mb-6">
           <img
-            src="../../public/logo.png"
+            src="/logo.png"
             alt="logo"
             className="w-40 h-40 rounded-2xl"
           />
