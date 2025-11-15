@@ -17,11 +17,21 @@ function ConfirmEmailPage() {
     setMessage("");
 
     try {
-      await sendPasswordResetEmail(auth, email);
-      setMessage("Se ha enviado un correo para restablecer tu contraseña. Revisa tu bandeja de entrada.");
+      // Configuración de la acción para el restablecimiento de contraseña
+      const actionCodeSettings = {
+        url: 'https://nextreadproject.web.app/change',
+        handleCodeInApp: false  
+      };
+      
+      // Enviar correo de restablecimiento de contraseña
+      await sendPasswordResetEmail(auth, email, actionCodeSettings);
+      
+      setMessage("✅ Se ha enviado un correo para restablecer tu contraseña. Revisa tu bandeja de entrada.");
+      
       setTimeout(() => {
         navigate("/login");
       }, 3000);
+      
     } catch (error) {
       console.error("Error al enviar correo:", error);
       switch (error.code) {

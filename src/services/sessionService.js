@@ -17,10 +17,10 @@ const SESSIONS_COLLECTION = 'user_sessions';
 export const registerLogin = async (user) => {
   try {
     
+    // Obtener los proveedores de autenticación del usuario
     const providers = user.providerData.map(profile => profile.providerId);
     
-    console.log('Registrando login con proveedores:', providers);
-    
+    // Crear el objeto de sesión
     const sessionData = {
       userId: user.uid,
       userEmail: user.email,
@@ -32,10 +32,11 @@ export const registerLogin = async (user) => {
       status: 'active'
     };
 
+    // Guardar la sesión en Firestore
     const docRef = await addDoc(collection(db, SESSIONS_COLLECTION), sessionData);
     localStorage.setItem('currentSessionId', docRef.id);
     
-    console.log('Sesión registrada con ID:', docRef.id);
+    
     return docRef.id;
   } catch (error) {
     console.error('Error registrando inicio de sesión:', error);
@@ -44,6 +45,7 @@ export const registerLogin = async (user) => {
 };
 
 
+// Registrar el cierre de sesión
 export const registerLogout = async () => {
   try {
     const sessionId = localStorage.getItem('currentSessionId');
@@ -51,24 +53,29 @@ export const registerLogout = async () => {
       console.log('No hay sesión activa para cerrar');
       return;
     }
-
+    // Obtener la referencia del documento de la sesión
     const sessionRef = doc(db, SESSIONS_COLLECTION, sessionId);
     const logoutTime = new Date();
-    
+
+    // Obtener los datos actuales de la sesión
     const sessionDoc = await getDoc(sessionRef);
+    
+    // Si el documento existe, actualizarlo
     if (sessionDoc.exists()) {
+      // Calcular la duración en segundos
       const sessionData = sessionDoc.data();
       const loginTime = sessionData.loginTime.toDate();
       const duration = Math.round((logoutTime - loginTime) / 1000);
 
+      // Actualizar el documento con la hora de cierre y duración
       await updateDoc(sessionRef, {
         logoutTime: logoutTime,
         duration: duration,
         status: 'inactive'
       });
 
+      // Limpiar el sessionId del almacenamiento local
       localStorage.removeItem('currentSessionId');
-      console.log('Sesión cerrada correctamente');
     }
   } catch (error) {
     console.error('Error registrando cierre de sesión:', error);

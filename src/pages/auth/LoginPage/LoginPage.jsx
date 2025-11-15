@@ -17,11 +17,11 @@ function LoginPage() {
 
   useSessionTracking();
 
-  
+  //Manejo de autenticación social con retroalimentación al usuario
   const handleSocialAuth = async (providerType, providerName) => {
     try {
       const result = await handleSocialLogin(providerType);
-      
+    
       if (result.success) {
         if (result.linked) {
           await Swal.fire({
@@ -73,7 +73,7 @@ function LoginPage() {
     }
   };
 
-  
+  //Manejo específico para inicio de sesión con Google
   const loginWithGoogle = async () => {
     try {
       const result = await checkEmailBeforeGoogleLogin();
@@ -103,7 +103,7 @@ function LoginPage() {
       }
     } catch (error) {
       console.error('Error con Google:', error);
-      
+      //Manejo de errores específico para Google
       if (error.code === "auth/popup-closed-by-user" || 
           error.code === "auth/cancelled-popup-request") {
         return;
@@ -123,6 +123,7 @@ function LoginPage() {
     }
   };
 
+  //Manejo específico para inicio de sesión con GitHub y Facebook
   const loginWithGithub = () => handleSocialAuth('github', 'GitHub');
   const loginWithFacebook = () => handleSocialAuth('facebook', 'Facebook');
 
@@ -132,7 +133,7 @@ function LoginPage() {
       [e.target.name]: e.target.value,
     });
   };
-
+//Manejo del envío del formulario de inicio de sesión
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -150,8 +151,11 @@ function LoginPage() {
     }
 
     try {
+
+      //Normalizar el correo electrónico a minúsculas
       const emailLower = email.toLowerCase();
 
+      //Intentar iniciar sesión con correo y contraseña
       const userCredential = await signInWithEmailAndPassword(
         auth,
         emailLower,
