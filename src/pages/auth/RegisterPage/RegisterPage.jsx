@@ -34,6 +34,8 @@ function RegisterPage() {
   };
 
   
+  //Guardamos el usuario en Firestore
+
   const saveUserToFirestore = async (user, username, method = "password") => {
     try {
       await setDoc(doc(db, "Users", user.uid), {
@@ -70,7 +72,7 @@ function RegisterPage() {
     try {
       const emailLower = email.toLowerCase();
 
-      
+      //Creamos el usuario con email y contraseña
       const userCredential = await createUserWithEmailAndPassword(auth, emailLower, password);
       const user = userCredential.user;
 
@@ -97,7 +99,7 @@ function RegisterPage() {
   
   const handleEmailAlreadyInUse = async (email, password, username) => {
     try {
-      
+      //Obtenemos los métodos de inicio de sesión asociados al email
       const methods = await fetchSignInMethodsForEmail(auth, email);
       console.log('Métodos existentes para', email, ':', methods);
 
@@ -118,7 +120,7 @@ function RegisterPage() {
         return;
       }
 
-      
+      //Mapear los nombres de los proveedores para mostrarlos nombres amigables
       const providerNames = methods.map(method => {
         if (method === 'google.com') return 'Google';
         if (method === 'facebook.com') return 'Facebook';
@@ -127,7 +129,7 @@ function RegisterPage() {
         return method;
       });
 
-      
+      //Si ya existe un método de correo y contraseña, no permitir vinculación      
       if (methods.includes('password')) {
         Swal.fire({
           icon: 'error',
@@ -144,7 +146,7 @@ function RegisterPage() {
         return;
       }
 
-      
+      //Preguntar al usuario si desea vincular cuentas
       const result = await Swal.fire({
         icon: 'question',
         title: '🔗 Vincular Cuenta',
@@ -175,7 +177,7 @@ function RegisterPage() {
         return;
       }
 
-      
+      //Proceder a vincular la cuenta
       Swal.fire({
         title: 'Vinculando cuenta...',
         html: 'Por favor inicia sesión con tu método existente',
@@ -188,7 +190,7 @@ function RegisterPage() {
       
       let provider;
       let providerName;
-
+      //Seleccionar el primer proveedor disponible para iniciar sesión
       if (methods.includes('google.com')) {
         provider = GoogleProvider;
         providerName = 'Google';
@@ -200,16 +202,16 @@ function RegisterPage() {
         providerName = 'GitHub';
       }
 
-      
+      //Iniciar sesión con el proveedor existente
       const loginResult = await signInWithPopup(auth, provider);
       
-      
+      //Crear las credenciales de correo y contraseña
       const credential = EmailAuthProvider.credential(email, password);
       
-      
+      //Vincular la nueva credencial al usuario existente
       await linkWithCredential(loginResult.user, credential);
       
-      
+      //Guardar el username en Firestore
       const userDoc = doc(db, "Users", loginResult.user.uid);
       await setDoc(userDoc, {
         username: username
