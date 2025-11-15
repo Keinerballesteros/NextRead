@@ -19,7 +19,7 @@ import Swal from 'sweetalert2';
 // ============================================
 export const checkEmailBeforeGoogleLogin = async () => {
   try {
-    // Pedir el email al usuario ANTES de hacer login
+    // Pedir el email al usuario ANTES de hacer login se hace esto porque Firebase crea la cuenta automáticamente al hacer login con Google
     const { value: email } = await Swal.fire({
       title: 'Ingresa tu correo de Google',
       input: 'email',
@@ -44,12 +44,10 @@ export const checkEmailBeforeGoogleLogin = async () => {
 
     // Verificar si este email ya existe
     const methods = await fetchSignInMethodsForEmail(auth, email);
-    
-    console.log('Métodos existentes para', email, ':', methods);
+  
 
     // Verificar si Google ya está vinculado
     if (methods.includes('google.com')) {
-      console.log('Google ya está vinculado, procediendo con login normal');
       // Si Google ya existe, hacer login normal
       return await handleSocialLogin('google');
     }
@@ -134,23 +132,21 @@ const linkGoogleToExistingAccount = async (existingProvider, providerName) => {
     });
 
     // 1. Login con el proveedor existente (GitHub/Facebook)
-    console.log('Paso 1: Iniciando sesión con', providerName);
     const loginResult = await signInWithPopup(auth, existingProvider);
-    console.log('✅ Login exitoso con', providerName);
-    console.log('Usuario actual:', loginResult.user.email);
+  
 
     // 2. USAR linkWithPopup en lugar de signInWithPopup + linkWithCredential
     Swal.update({
       html: 'Ahora selecciona tu cuenta de Google para vincularla...'
     });
 
-    console.log('Paso 2: Vinculando Google directamente con linkWithPopup');
+    
     await linkWithPopup(loginResult.user, GoogleProvider);
-    console.log('✅ Google vinculado exitosamente');
+   
     
     Swal.close();
 
-
+    
     return {
       success: true,
       user: loginResult.user,
