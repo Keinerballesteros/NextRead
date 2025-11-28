@@ -33,6 +33,7 @@ import DetailOpinion from './pages/opinions/DetailOpinionPage'
 import EditOpinion from './pages/opinions/EditOpinionPage'
 import AdminUsersPage from './pages/sessions/AdminUsersPage'
 import LinkProvidersPage from './pages/sessions/LinkProvidersPage'
+import ProtectedRoute from './components/ProtectedRouter'
 
 function App() {
   
@@ -41,7 +42,7 @@ function App() {
     <>
      <BrowserRouter>
     <Routes>
-      <Route path='/home' element={<HomeHooks/>}/>
+      <Route path='/hooks' element={<HomeHooks/>}/>
       <Route path='/usestate' element={<HookUseState/>}/>
       <Route path='/usecallback' element={<HookCallback/>}/> 
       <Route path='/usecontext' element={<HookUseContext/>}/> 
@@ -59,20 +60,22 @@ function App() {
       <Route path='/useactionstate' element={<HookUseActionsState/>}/>
       <Route path='/usesyncexternalstore' element={<HookUseSyncExternalStore/>}/>
       <Route path='/usetransition' element={<HookUseTransition/>}/>
+
+
       <Route path='/login' element={<LoginPage/>}/>
       <Route path='/register' element={<RegisterPage/>}/>
       <Route path='/confirm' element={<ConfirmEmailPage/>}/>
       <Route path='/change' element={<ChangePassword/>}/>
-      <Route path='/' element={<DashboardPage/>}/>
-      <Route path="/books" element={<BookList />} />
-      <Route path="/create" element={<CreateBook />} />
-      <Route path="/edit-book/:id" element={<EditBook />} />
-      <Route path='/createopinion' element={<OpinionsPage/>}/>
-      <Route path='/opinions' element={<OpinionsList/>}/>
-      <Route path="/opinions/:id" element={<DetailOpinion />} />
-      <Route path="/opinions/edit/:id" element={<EditOpinion />} />
-      <Route path="/admin/users" element={<AdminUsersPage />} />
-      <Route path="/settings" element={<LinkProvidersPage/>} />
+      <Route path='/' element={<ProtectedRoute><DashboardPage/></ProtectedRoute> }/>
+      <Route path="/books" element={<ProtectedRoute><BookList /></ProtectedRoute> } />
+      <Route path="/create" element={<ProtectedRoute><CreateBook /></ProtectedRoute>} />
+      <Route path="/edit-book/:id" element={<ProtectedRoute><EditBook /></ProtectedRoute> } />
+      <Route path='/createopinion' element={<ProtectedRoute><OpinionsPage/></ProtectedRoute>}/>
+      <Route path='/opinions' element={<ProtectedRoute><OpinionsList/></ProtectedRoute>}/>
+      <Route path="/opinions/:id" element={<ProtectedRoute><DetailOpinion /></ProtectedRoute>} />
+      <Route path="/opinions/edit/:id" element={<ProtectedRoute><EditOpinion /></ProtectedRoute>} />
+      <Route path="/admin/users" element={<ProtectedRoute><AdminUsersPage /></ProtectedRoute>} />
+      <Route path="/settings" element={<ProtectedRoute><LinkProvidersPage/></ProtectedRoute>} />
     </Routes>
     </BrowserRouter>
     </>
