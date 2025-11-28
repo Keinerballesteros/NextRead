@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { getAllSessions } from '../../services/sessionService';
 import { FaSearch, FaSort, FaSortUp, FaSortDown, FaUsers, FaCalendar, FaSync, FaGoogle, FaGithub, FaFacebook, FaEnvelope } from 'react-icons/fa';
+import SessionsPDFGenerator from '../../components/SessionsPDFGenerator'; 
+import SessionsExcelGenerator from '../../components/SessionsExcelGenerator';
+
 
 const AdminUsersPage = () => {
   const [sessions, setSessions] = useState([]);
@@ -352,6 +355,8 @@ const AdminUsersPage = () => {
               >
                 Limpiar filtros
               </button>
+              <SessionsExcelGenerator sessions={sortedSessions} filters={filters} />
+              <SessionsPDFGenerator sessions={sortedSessions} filters={filters} />
             </div>
           </div>
         </div>
