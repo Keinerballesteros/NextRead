@@ -10,13 +10,14 @@ import {
   FaTimes,
   FaArrowLeft
 } from "react-icons/fa";
-import { db } from "../../firebase";
+import { db, auth } from "../../firebase";
 import { 
   doc, 
   getDoc, 
   updateDoc, 
   serverTimestamp 
 } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 
 function EditBook() {
   const { id } = useParams();
@@ -31,6 +32,7 @@ function EditBook() {
   const [images, setImages] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
 
   const categories = [
     "Ficción", "No Ficción", "Ciencia Ficción", "Fantasía", "Misterio",
@@ -39,51 +41,80 @@ function EditBook() {
     "Viajes", "Infantil", "Juvenil", "Poesía", "Drama",
   ];
 
-  
+  // Verificar autenticación
   useEffect(() => {
-    const fetchBook = async () => {
-      try {
-        const docRef = doc(db, "books", id);
-        const docSnap = await getDoc(docRef);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUser(user);
+        fetchBook(user.uid);
+      } else {
+        setCurrentUser(null);
+        setLoading(false);
+        Swal.fire({
+          icon: "warning",
+          title: "Acceso requerido",
+          text: "Debes iniciar sesión para editar un libro",
+        }).then(() => {
+          navigate("/books");
+        });
+      }
+    });
 
-        if (docSnap.exists()) {
-          const bookData = docSnap.data();
-          setFormData({
-            title: bookData.title || "",
-            author: bookData.author || "",
-            category: bookData.category || "",
-            price: bookData.price?.toString() || "",
-            description: bookData.description || "",
-          });
+    return () => unsubscribe();
+  }, [id, navigate]);
 
-          
-          if (bookData.imagePreviews && bookData.imagePreviews.length > 0) {
-            setImages(bookData.imagePreviews.map((preview, index) => ({
-              preview,
-            })));
-          }
-        } else {
+  const fetchBook = async (userId) => {
+    try {
+      const docRef = doc(db, "books", id);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const bookData = docSnap.data();
+        
+        // Verificar que el libro pertenece al usuario actual
+        if (bookData.userId !== userId) {
           Swal.fire({
             icon: "error",
-            title: "Libro no encontrado",
-            text: "El libro que intentas editar no existe",
+            title: "Acceso denegado",
+            text: "No tienes permiso para editar este libro",
           });
           navigate("/books");
+          return;
         }
-      } catch (error) {
-        console.error("Error cargando libro:", error);
+
+        setFormData({
+          title: bookData.title || "",
+          author: bookData.author || "",
+          category: bookData.category || "",
+          price: bookData.price?.toString() || "",
+          description: bookData.description || "",
+        });
+
+        // Cargar imágenes existentes
+        if (bookData.imagePreviews && bookData.imagePreviews.length > 0) {
+          setImages(bookData.imagePreviews.map((preview, index) => ({
+            preview,
+          })));
+        }
+      } else {
         Swal.fire({
           icon: "error",
-          title: "Error",
-          text: "No se pudo cargar el libro",
+          title: "Libro no encontrado",
+          text: "El libro que intentas editar no existe",
         });
-      } finally {
-        setLoading(false);
+        navigate("/books");
       }
-    };
-
-    fetchBook();
-  }, [id, navigate]);
+    } catch (error) {
+      console.error("Error cargando libro:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudo cargar el libro",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -139,6 +170,15 @@ function EditBook() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!currentUser) {
+      Swal.fire({
+        icon: "error",
+        title: "Error de autenticación",
+        text: "Debes iniciar sesión para editar el libro",
+      });
+      return;
+    }
     
     setIsSubmitting(true);
 
@@ -237,7 +277,7 @@ function EditBook() {
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-6 text-black">
-          
+          {/* Los campos del formulario permanecen igual */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">
               Nombre del Libro *

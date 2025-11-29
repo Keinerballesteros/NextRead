@@ -11,25 +11,49 @@ import {
   FaDollarSign,
   FaHome
 } from "react-icons/fa";
-import { db } from "../../firebase";
+import { db, auth } from "../../firebase"; 
 import { 
   collection, 
   getDocs, 
   deleteDoc, 
   doc, 
   query, 
-  orderBy
+  orderBy,
+  where
 } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 
 function BookList() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
 
-  const fetchBooks = async () => {
+  // Verificar autenticación
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUser(user);
+        fetchBooks(user.uid);
+      } else {
+        setCurrentUser(null);
+        setBooks([]);
+        setLoading(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const fetchBooks = async (userId) => {
     try {
       setLoading(true);
-      const q = query(collection(db, "books"), orderBy("createdAt", "desc"));
+      
+      const q = query(
+        collection(db, "books"), 
+        where("userId", "==", userId),
+        orderBy("createdAt", "desc")
+      );
       
       const querySnapshot = await getDocs(q);
       const booksData = [];
@@ -44,19 +68,18 @@ function BookList() {
       setBooks(booksData);
     } catch (error) {
       console.error("Error cargando libros:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "No se pudieron cargar los libros",
-      });
+      // Solo mostrar error si es un error real, no cuando no hay libros
+      if (error.code !== 'failed-precondition' && error.code !== 'not-found') {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "No se pudieron cargar los libros",
+        });
+      }
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchBooks();
-  }, []);
 
   const handleDeleteBook = async (bookId, bookTitle) => {
     const result = await Swal.fire({
@@ -109,6 +132,30 @@ function BookList() {
     });
   };
 
+  // Si no hay usuario autenticado
+  if (!currentUser && !loading) {
+    return (
+      <div className="min-h-screen bg-[#f0f0f0] flex items-center justify-center">
+        <div className="bg-white rounded-2xl shadow-lg p-12 text-center border border-gray-200 max-w-md">
+          <FaBook className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-2xl font-bold text-gray-700 mb-2">
+            Acceso requerido
+          </h3>
+          <p className="text-gray-600 mb-6">
+            Debes iniciar sesión para ver tus libros publicados.
+          </p>
+          <Link
+            to="/"
+            className="bg-blue-500 text-white py-3 px-6 rounded-2xl font-semibold shadow-lg hover:bg-blue-600 transition-all duration-300 flex items-center gap-2 justify-center"
+          >
+            <FaHome className="h-4 w-4" />
+            Volver al Home
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#f0f0f0] flex items-center justify-center">
@@ -123,7 +170,6 @@ function BookList() {
   return (
     <div className="min-h-screen bg-[#f0f0f0] py-8">
       <div className="container mx-auto px-4">
-        
         
         <div className="text-center mb-8 relative">
           <Link
@@ -149,7 +195,6 @@ function BookList() {
           </p>
         </div>
 
-        
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 border border-gray-200">
           <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
             
@@ -220,7 +265,7 @@ function BookList() {
               </Link>
               {books.length === 0 && (
                 <Link
-                  to="/create-book"
+                  to="/create"
                   className="bg-blue-500 text-white py-3 px-6 rounded-2xl font-semibold shadow-lg hover:bg-blue-600 transition-all duration-300 flex items-center gap-2"
                 >
                   <FaPlus className="h-4 w-4" />

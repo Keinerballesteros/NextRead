@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -9,8 +9,9 @@ import {
   FaUpload, 
   FaTimes 
 } from "react-icons/fa";
-import { db } from "../../firebase"; 
+import { db, auth } from "../../firebase"; 
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 
 function CreateBook() {
   const navigate = useNavigate();
@@ -23,12 +24,32 @@ function CreateBook() {
   });
   const [images, setImages] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   const categories = [
     "Ficción", "Ciencia Ficción", "Fantasía", "Misterio",
-    "Romance", "Terror",  "Historia", "Ciencia",
+    "Romance", "Terror", "Historia", "Ciencia",
     "Tecnología", "Arte", "Infantil", "Poesía", "Drama",
   ];
+
+  // Verificar autenticación
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUser(user);
+      } else {
+        Swal.fire({
+          icon: "warning",
+          title: "Acceso requerido",
+          text: "Debes iniciar sesión para publicar un libro",
+        }).then(() => {
+          navigate("/");
+        });
+      }
+    });
+
+    return () => unsubscribe();
+  }, [navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -85,6 +106,15 @@ function CreateBook() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    if (!currentUser) {
+      Swal.fire({
+        icon: "error",
+        title: "Error de autenticación",
+        text: "Debes iniciar sesión para publicar un libro",
+      });
+      return;
+    }
+    
     setIsSubmitting(true);
 
     if (!formData.title || !formData.author || !formData.category || !formData.price) {
@@ -111,6 +141,8 @@ function CreateBook() {
         hasImages: images.length > 0,
         imagesCount: images.length,
         imagePreviews: imagePreviews, 
+        userId: currentUser.uid, 
+        userEmail: currentUser.email, 
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       };
@@ -151,6 +183,18 @@ function CreateBook() {
     }
   };
 
+  // Si no hay usuario, mostrar mensaje de carga
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-[#f0f0f0] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg">Verificando autenticación...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <section className="flex items-center justify-center min-h-screen bg-[#f0f0f0] py-8">
       <div className="w-full max-w-2xl bg-white rounded-3xl shadow-2xl p-8 border border-gray-200 mx-4">
@@ -170,6 +214,7 @@ function CreateBook() {
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-6 text-black">
+          {/* Los campos del formulario permanecen igual */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">
               Nombre del Libro *
