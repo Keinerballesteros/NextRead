@@ -332,9 +332,7 @@ const handleAccountLinking = async (error, attemptedProviderType) => {
   }
 };
 
-// ============================================
-// FUNCIONES AUXILIARES
-// ============================================
+
 const getProviderName = (providerType) => {
   const names = {
     'google': 'Google',
